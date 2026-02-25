@@ -196,21 +196,24 @@ useEffect(() => {
   const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
 
   // --- Draw links
-  g.append('g')
-    .selectAll('path')
-    .data(sankeyLinks)
-    .join('path')
-    .attr('d', sankeyLinkHorizontal())
-    .attr('stroke', d => {
-      const name = sankeyNodes[d.target.index].name
-      if (name.startsWith('Tax')) return '#ef4444'
-      if (name.startsWith('UIF')) return '#fbbf24'
-      if (name.startsWith('Pension')) return '#f97316'
-      return '#4f46e5'
-    })
-    .attr('stroke-width', d => Math.max(1, d.width || 1))
-    .attr('fill', 'none')
-    .attr('opacity', 0.5)
+
+g.append('g')
+  .selectAll('path')
+  .data(sankeyLinks)
+  .join('path')
+  .attr('d', sankeyLinkHorizontal())
+  .attr('stroke', d => {
+    // d.target is a SankeyNode here
+    const targetNode = d.target as SankeyNode
+    const name = targetNode.name
+    if (name.startsWith('Tax')) return '#ef4444'
+    if (name.startsWith('UIF')) return '#fbbf24'
+    if (name.startsWith('Pension')) return '#f97316'
+    return '#4f46e5'
+  })
+  .attr('stroke-width', d => Math.max(1, d.width || 1))
+  .attr('fill', 'none')
+  .attr('opacity', 0.5)
 
   // --- Draw nodes
   g.append('g')
