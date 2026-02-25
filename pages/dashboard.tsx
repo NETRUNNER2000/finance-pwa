@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
@@ -5,7 +6,6 @@ import { supabase } from '../lib/supabaseClient'
 import { useRouter } from 'next/router'
 import * as d3 from 'd3'
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
-
 
 interface Transaction {
   id: string
@@ -21,16 +21,15 @@ export default function Dashboard() {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
+  const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
   const router = useRouter()
 
-  const sankeyRef = useRef<SVGSVGElement | null>(null)
-
+    const sankeyRef = useRef<SVGSVGElement | null>(null)
 
   // --- Fetch current user ---
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
-
       if (!data.user) {
         router.push('/login')
       } else {
@@ -38,48 +37,86 @@ export default function Dashboard() {
         fetchTransactions(data.user.id)
       }
     }
-
     getUser()
   }, [])
 
-  // --- Fetch transactions for current user ---
+  // --- Fetch transactions ---
   const fetchTransactions = async (userId: string) => {
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
-      .eq('user_id', userId)
       .order('transaction_date', { ascending: false })
 
-    if (error) {
-      console.error(error)
-    } else {
-      setTransactions(data)
-    }
+    if (error) console.error(error)
+    else setTransactions(data || [])
   }
 
-  // --- Add a new transaction ---
+  // --- Add transaction ---
   const addTransaction = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
-
     const { data, error } = await supabase.from('transactions').insert([
-      {
-        user_id: user.id,
-        amount: parseFloat(amount),
-        category,
-        description,
-      },
+      { user_id: user.id, amount: parseFloat(amount), category, description },
     ])
-
-    if (error) {
-      console.error(error)
-      alert('Failed to add transaction')
-    } else {
-      // Clear form and refresh list
+    if (error) alert('Failed to add transaction')
+    else {
       setAmount('')
       setCategory('')
       setDescription('')
       fetchTransactions(user.id)
+    }
+  }
+
+const deleteTransaction = async (transactionId: string) => {
+  if (!user) return
+  if (!confirm('Are you sure you want to delete this transaction?')) return
+
+  try {
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', transactionId)
+      .eq('user_id', user.id) // ensure only user's own transactions can be deleted
+
+    if (error) {
+      console.error('Delete error:', error)
+      alert(`Delete failed: ${error.message}`)
+    } else {
+      // Refresh transactions after delete
+      setTransactions(transactions.filter(t => t.id !== transactionId))
+    }
+  } catch (err) {
+    console.error('Delete exception:', err)
+    alert('Something went wrong while deleting')
+  }
+}
+
+  // --- Share transaction ---
+  const shareTransaction = async (transactionId: string) => {
+    const email = shareEmails[transactionId]
+    if (!email) return alert("Enter a user's email")
+    if (!user) return
+
+    try {
+      const { data: partnerUser, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single()
+
+      if (userError || !partnerUser) return alert('User not found')
+
+      const { error: insertError } = await supabase
+        .from('transaction_access')
+        .insert([{ transaction_id: transactionId, user_id: partnerUser.id }])
+
+      if (insertError) return alert(`Error sharing transaction: ${insertError.message}`)
+
+      alert('Transaction shared!')
+      setShareEmails({ ...shareEmails, [transactionId]: '' })
+    } catch (err) {
+      console.error('Share error:', err)
+      alert('Something went wrong while sharing')
     }
   }
 
@@ -88,7 +125,7 @@ export default function Dashboard() {
     router.push('/login')
   }
 
-    // --- Dummy Sankey Chart ---
+   // --- Dummy Sankey Chart ---
   useEffect(() => {
     if (!sankeyRef.current) return
 
@@ -121,13 +158,13 @@ interface SankeyLink {
   target: number
   value: number
 }
-  
 const sankeyGenerator = sankey<SankeyNode, SankeyLink>()
   .nodeWidth(20)
   .nodePadding(10)
   .extent([[0, 0], [width, height]])
 
 const { nodes, links } = sankeyGenerator(JSON.parse(JSON.stringify(sankeyData)))
+
     // Links
     svg
       .append('g')
@@ -140,7 +177,7 @@ const { nodes, links } = sankeyGenerator(JSON.parse(JSON.stringify(sankeyData)))
       .attr('fill', 'none')
       .attr('opacity', 0.5)
 
-    // Nodes
+       // Nodes
     const node = svg
       .append('g')
       .selectAll('rect')
@@ -166,75 +203,114 @@ const { nodes, links } = sankeyGenerator(JSON.parse(JSON.stringify(sankeyData)))
       .attr('fill', '#000')
   }, [])
 
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>Welcome {user?.email}</p>
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard</h1>
+          <div className="flex gap-2 items-center">
+            <p className="text-gray-800">Welcome {user?.email}</p>
+            <button
+              onClick={logout}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
 
-      <button
-        onClick={logout}
-        className="bg-red-600 text-white p-2 mt-4 rounded"
-      >
-        Logout
-      </button>
+        {/* Add Transaction Form */}
+        <div className="bg-white p-6 rounded shadow mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
+          <form
+            onSubmit={addTransaction}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+          >
+            <input
+              type="number"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="border p-2 rounded w-full text-gray-900"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="border p-2 rounded w-full text-gray-900"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="border p-2 rounded w-full text-gray-900"
+            />
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition col-span-full sm:col-auto"
+            >
+              Add
+            </button>
+          </form>
+        </div>
 
-      {/* --- Add Transaction Form --- */}
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold">Add Transaction</h2>
-        <form onSubmit={addTransaction} className="mt-2 flex flex-col gap-2 max-w-sm">
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="border p-2 rounded"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="border p-2 rounded"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 rounded"
-          />
-          <button type="submit" className="bg-green-600 text-white p-2 rounded">
-            Add
-          </button>
-        </form>
-      </div>
+        {/* Transactions List */}
+        <div className="bg-white p-6 rounded shadow">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Transactions</h2>
+          {transactions.length === 0 ? (
+            <p className="text-gray-500">No transactions yet</p>
+          ) : (
+            <ul className="space-y-4">
+              {transactions.map((t) => (
+                <li
+                  key={t.id}
+                  className="border p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-50"
+                >
+                  <div className="text-gray-900">
+                    <strong>{t.category}</strong>: ${t.amount.toFixed(2)}
+                    {t.description && ` — ${t.description}`}
+                  </div>
 
-      {/* --- Transaction List --- */}
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold">Your Transactions</h2>
-        {transactions.length === 0 ? (
-          <p className="mt-2 text-gray-600">No transactions yet</p>
-        ) : (
-          <ul className="mt-2 space-y-1">
-            {transactions.map((t) => (
-              <li key={t.id} className="border p-2 rounded">
-                <strong>{t.category}</strong>: ${t.amount.toFixed(2)}{' '}
-                {t.description && `— ${t.description}`}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-       {/* Sankey Chart */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+                    {/* Share input */}
+                    <input
+                      type="email"
+                      placeholder="Partner email"
+                      value={shareEmails[t.id] || ''}
+                      onChange={(e) =>
+                        setShareEmails({ ...shareEmails, [t.id]: e.target.value })
+                      }
+                      className="border p-1 rounded flex-1 sm:w-48 text-gray-900"
+                    />
+                    <button
+                      onClick={() => shareTransaction(t.id)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                    >
+                      Share
+                    </button>
+                    <button
+                      onClick={() => deleteTransaction(t.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+            {/* Sankey Chart */}
         <div className="bg-white p-6 rounded shadow mb-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Transactions Sankey (Dummy)</h2>
           <svg ref={sankeyRef} width={600} height={300}></svg>
         </div>
+      </div>
     </div>
   )
 }
-
-
