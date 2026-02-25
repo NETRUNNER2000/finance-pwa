@@ -125,105 +125,106 @@
       router.push('/login')
     }
 
-    useEffect(() => {
-    if (!sankeyRef.current) return
+useEffect(() => {
+  if (!sankeyRef.current) return
 
-    const svg = d3.select(sankeyRef.current)
-    svg.selectAll('*').remove()
+  const svg = d3.select(sankeyRef.current)
+  svg.selectAll('*').remove()
 
-    const container = sankeyRef.current.parentElement
-    const fullWidth = container ? container.offsetWidth : 600
-    const fullHeight = 400
+  // --- Sankey layout fixed size for positions
+  const layoutWidth = 600
+  const layoutHeight = 400
+  const margin = { top: 20, right: 140, bottom: 20, left: 20 } // extra right for labels
 
-    // Add more right margin to avoid label cutoff
-    const margin = { top: 20, right: 140, bottom: 20, left: 20 }
-    const width = fullWidth - margin.left - margin.right
-    const height = fullHeight - margin.top - margin.bottom
+  const grossIncome = 29000
+  const netIncome = 23700
 
-    const grossIncome = 29000
-    const netIncome = 23700
+  // Group transactions
+  const categorySums: Record<string, number> = {}
+  transactions.forEach(t => {
+    categorySums[t.category] = (categorySums[t.category] || 0) + t.amount
+  })
+  const categories = Object.keys(categorySums)
+  const spentTotal = Object.values(categorySums).reduce((a, b) => a + b, 0)
+  const remaining = Math.max(netIncome - spentTotal, 0)
 
-    // Group transactions by category
-    const categorySums: Record<string, number> = {}
-    transactions.forEach(t => {
-      if (!categorySums[t.category]) categorySums[t.category] = 0
-      categorySums[t.category] += t.amount
+  const nodes = [
+    { name: `Gross [${grossIncome}]` },
+    { name: `Net [${netIncome}]` },
+    ...categories.map(c => ({ name: `${c} [${categorySums[c]}]` })),
+    { name: `Remaining [${remaining}]` }
+  ]
+
+  const links = [
+    { source: 0, target: 1, value: netIncome },
+    ...categories.map((c, i) => ({ source: 1, target: i + 2, value: categorySums[c] })),
+    { source: 1, target: nodes.length - 1, value: remaining }
+  ]
+
+  interface SankeyNode { name: string; x0?: number; x1?: number; y0?: number; y1?: number }
+  interface SankeyLink { source: number; target: number; value: number; width?: number }
+
+  const sankeyGenerator = sankey<SankeyNode, SankeyLink>()
+    .nodeWidth(20)
+    .nodePadding(10)
+    .extent([[0, 0], [layoutWidth, layoutHeight]])
+
+  const { nodes: sankeyNodes, links: sankeyLinks } = sankeyGenerator({
+    nodes: JSON.parse(JSON.stringify(nodes)),
+    links: JSON.parse(JSON.stringify(links))
+  })
+
+  // --- Responsive SVG
+  svg
+    .attr(
+      'viewBox',
+      `0 0 ${layoutWidth + margin.left + margin.right} ${layoutHeight + margin.top + margin.bottom}`
+    )
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', 'auto')
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
+
+  // --- Draw links
+  g.append('g')
+    .selectAll('path')
+    .data(sankeyLinks)
+    .join('path')
+    .attr('d', sankeyLinkHorizontal())
+    .attr('stroke', '#4f46e5')
+    .attr('stroke-width', d => Math.max(1, d.width || 1))
+    .attr('fill', 'none')
+    .attr('opacity', 0.5)
+
+  // --- Draw nodes
+  g.append('g')
+    .selectAll('rect')
+    .data(sankeyNodes)
+    .join('rect')
+    .attr('x', d => d.x0 || 0)
+    .attr('y', d => d.y0 || 0)
+    .attr('height', d => (d.y1 || 0) - (d.y0 || 0))
+    .attr('width', d => (d.x1 || 0) - (d.x0 || 0))
+    .attr('fill', d => {
+      if (d.name.startsWith('Gross')) return '#f59e0b'
+      if (d.name.startsWith('Net')) return '#6366f1'
+      if (d.name.startsWith('Remaining')) return '#22c55e'
+      return '#2563eb'
     })
-    const categories = Object.keys(categorySums)
-    const spentTotal = Object.values(categorySums).reduce((a, b) => a + b, 0)
-    const remaining = Math.max(netIncome - spentTotal, 0)
 
-    const nodes = [
-      { name: `Gross [${grossIncome}]` },
-      { name: `Net [${netIncome}]` },
-      ...categories.map(c => ({ name: `${c} [${categorySums[c]}]` })),
-      { name: `Remaining [${remaining}]` }
-    ]
-
-    const links = [
-      { source: 0, target: 1, value: netIncome },
-      ...categories.map((c, i) => ({ source: 1, target: i + 2, value: categorySums[c] })),
-      { source: 1, target: nodes.length - 1, value: remaining }
-    ]
-
-    interface SankeyNode { name: string; x0?: number; x1?: number; y0?: number; y1?: number }
-    interface SankeyLink { source: number; target: number; value: number; width?: number }
-
-    const sankeyGenerator = sankey<SankeyNode, SankeyLink>()
-      .nodeWidth(20)
-      .nodePadding(10)
-      .extent([[0, 0], [width, height]])
-
-    const { nodes: sankeyNodes, links: sankeyLinks } = sankeyGenerator({
-      nodes: JSON.parse(JSON.stringify(nodes)),
-      links: JSON.parse(JSON.stringify(links))
-    })
-
-    const g = svg
-      .attr('width', '100%')
-      .attr('height', fullHeight)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`)
-
-    // Draw links
-    g.append('g')
-      .selectAll('path')
-      .data(sankeyLinks)
-      .join('path')
-      .attr('d', sankeyLinkHorizontal())
-      .attr('stroke', '#4f46e5')
-      .attr('stroke-width', d => Math.max(1, d.width || 1))
-      .attr('fill', 'none')
-      .attr('opacity', 0.5)
-
-    // Draw nodes
-    g.append('g')
-      .selectAll('rect')
-      .data(sankeyNodes)
-      .join('rect')
-      .attr('x', d => d.x0 || 0)
-      .attr('y', d => d.y0 || 0)
-      .attr('height', d => (d.y1 || 0) - (d.y0 || 0))
-      .attr('width', d => (d.x1 || 0) - (d.x0 || 0))
-      .attr('fill', d => {
-        if (d.name.startsWith('Gross')) return '#f59e0b'
-        if (d.name.startsWith('Net')) return '#6366f1'
-        if (d.name.startsWith('Remaining')) return '#22c55e'
-        return '#2563eb'
-      })
-
-    // Node labels (to the right of nodes)
-    g.append('g')
-      .selectAll('text')
-      .data(sankeyNodes)
-      .join('text')
-      .attr('x', d => (d.x1 || 0) + 6) // label outside node
-      .attr('y', d => ((d.y1 || 0) + (d.y0 || 0)) / 2)
-      .attr('alignment-baseline', 'middle')
-      .text(d => d.name)
-      .attr('fill', '#000')
-      .style('font-size', '12px')
-  }, [transactions])
+  // --- Node labels
+  g.append('g')
+    .selectAll('text')
+    .data(sankeyNodes)
+    .join('text')
+    .attr('x', d => (d.x1 || 0) + 6)
+    .attr('y', d => ((d.y1 || 0) + (d.y0 || 0)) / 2)
+    .attr('alignment-baseline', 'middle')
+    .text(d => d.name)
+    .attr('fill', '#000')
+    .style('font-size', '12px')
+}, [transactions])
 
     return (
       <div className="min-h-screen bg-gray-100 p-4">
