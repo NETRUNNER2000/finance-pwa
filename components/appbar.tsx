@@ -4,7 +4,9 @@ import { supabase } from '../lib/supabaseClient'
 import { useState, useEffect } from 'react'
 
 const links = [
-  { label: 'Transactions', href: '/transactions' }
+  {label: 'Dashboard', href:"/dashboard"},
+  { label: 'Transactions', href: '/transactions' },
+  
 ]
 
 interface AppbarProps {

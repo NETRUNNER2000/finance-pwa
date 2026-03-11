@@ -36,49 +36,45 @@ const User = ({ user, setUser, selectedAccount, setSelectedAccount }: Transactio
   }
 
   // --- Grant access to another user ---
-  const grantAccess = async () => {
-    const sanitizedEmail = grantEmail.trim().toLowerCase()
-    if (!sanitizedEmail) return alert('Enter a valid email')
+const grantAccess = async () => {
+  const sanitizedEmail = grantEmail.trim().toLowerCase()
+  if (!sanitizedEmail) return alert('Enter a valid email')
 
-    if (!user) return alert('User not authenticated')
-    setGrantLoading(true)
+  if (!user) return alert('User not authenticated')
+  setGrantLoading(true)
 
-    const { error } = await supabase.rpc('grant_transaction_access', {
-      p_user_id: user.id,
-      p_target_email: sanitizedEmail
+  try {
+    // Call the RPC function 'grant_transaction_access'
+    const { data, error } = await supabase.rpc('grant_transaction_access', {
+      p_user_email: sanitizedEmail,
+      p_grantor_id: user.id
     })
 
-    setGrantLoading(false)
-
     if (error) {
-      alert(`Failed to grant access: ${error.message}`)
-    } else {
-      alert(`All transactions shared with ${sanitizedEmail}`)
-      setGrantEmail('')
+      console.error('RPC error:', error)
+      alert('Failed to grant access: ' + error.message)
+      return
     }
-  }
 
+    // The SQL function returns a string message
+    // Possible: 'User does not exist', 'Access already granted', 'Access granted successfully'
+    if (data) {
+      alert(data)
+      if (data === 'Access granted successfully') {
+        setGrantEmail('') // clear input on success
+      }
+    } else {
+      alert('Unexpected response from server')
+    }
+  } catch (err) {
+    console.error('Unexpected error:', err)
+    alert('An unexpected error occurred')
+  } finally {
+    setGrantLoading(false)
+  }
+}
   return (
     <Page title='User' user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}>
-      <Section>
-        <h2 className='text-xl font-semibold'>Story</h2>
-        <div className='mt-2'>
-          <p className='text-zinc-600 dark:text-zinc-400'>
-            &quot;I confess that when this all started, you were like a picture
-            out of focus to me. And it took time for my eyes to adjust to you, to
-            make sense of you, to really recognize you.&quot;
-          </p>
-
-          <br />
-
-          <p className='text-sm text-zinc-600 dark:text-zinc-400'>
-            <a href='https://twosentencestories.com/vision' className='underline'>
-              Vision
-            </a>
-            , a two sentence story
-          </p>
-        </div>
-      </Section>
 
       <Section>
         <h2 className='text-xl font-semibold mb-2'>Account Actions</h2>

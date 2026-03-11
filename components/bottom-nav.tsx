@@ -35,7 +35,7 @@ export default BottomNav
 const links = [
 	{
 		label: 'Home',
-		href: '/',
+		href: '/dashboard',
 		icon: (
 			<svg
 				viewBox='0 0 15 15'

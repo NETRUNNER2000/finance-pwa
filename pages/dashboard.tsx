@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useRouter } from 'next/router'
 import * as d3 from 'd3'
@@ -25,38 +25,34 @@ export default function Dashboard({ user, setUser, selectedAccount, setSelectedA
   const router = useRouter()
   const sankeyRef = useRef<SVGSVGElement | null>(null)
 
-  // --- Fetch current user ---
-  useEffect(() => {
-      // --- Fetch category totals via stored procedure ---
-    const fetchCategoryTotals = async (userId: string) => {
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = today.getMonth()
-      console.log('Fetching category totals for:', year, month)
+  // Make fetchCategoryTotals stable using useCallback
+  const fetchCategoryTotals = useCallback(async (userId: string) => {
+    if (!userId) return
 
-      const { data, error } = await supabase.rpc('get_category_totals_by_paymonth', {
-        p_user_id: userId,
-        p_year: year,
-        p_month: month,
-        p_payday: payday
-      })
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = today.getMonth()
+    console.log('Fetching category totals for:', userId, year, month)
 
-      if (error) console.error(error)
-      else setCategoryTotals(data || [])
+    const { data, error } = await supabase.rpc('get_category_totals_by_paymonth', {
+      p_user_id: userId,
+      p_year: year,
+      p_month: month,
+      p_payday: payday
+    })
+
+    if (error) console.error(error)
+    else setCategoryTotals(data || [])
+
     console.log('Fetched category totals:', data)
-    }
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      if (!data.user) router.push('/login')
-      else {
-        setUser(data.user)
-        fetchCategoryTotals(data.user.id)
-      }
-    }
-    getUser()
-  }, [payday, router, setUser])
+  }, [payday]) // depends on payday
 
+  // useEffect runs whenever selectedAccount changes
+  useEffect(() => {
+    if (!selectedAccount) return
 
+    fetchCategoryTotals(selectedAccount)
+  }, [selectedAccount, fetchCategoryTotals])
 
   // --- Sankey chart ---
   useEffect(() => {

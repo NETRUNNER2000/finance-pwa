@@ -76,7 +76,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
         try {
             const { error } = await supabase.from('transactions').insert([
                 {
-                    user_id: user.id,
+                    user_id: selectedAccount,
                     amount: parsedAmount,
                     category: sanitizedCategory,
                     description: sanitizedDescription || null,
@@ -108,7 +108,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
                 .from('transactions')
                 .delete()
                 .eq('id', transactionId)
-                .eq('user_id', user.id)
+                .eq('user_id', selectedAccount)
 
             if (error) throw error
             setTransactions(transactions.filter(t => t.id !== transactionId))
