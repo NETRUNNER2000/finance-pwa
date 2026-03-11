@@ -15,9 +15,11 @@ interface CategoryTotal {
 interface DashboardProps {
   user: any // you can type this properly later
   setUser: (user: any) => void
+  selectedAccount?: string | null
+  setSelectedAccount: (account: string | null) => void
 }
 
-export default function Dashboard({ user, setUser }: DashboardProps) {
+export default function Dashboard({ user, setUser, selectedAccount, setSelectedAccount }: DashboardProps) {
   const [categoryTotals, setCategoryTotals] = useState<CategoryTotal[]>([])
   const [payday, setPayday] = useState(25) // default pay date
   const router = useRouter()
@@ -168,7 +170,7 @@ export default function Dashboard({ user, setUser }: DashboardProps) {
   }, [categoryTotals])
 
   return (
-    <Page title="Dashboard" user={user}>
+    <Page title="Dashboard" user={user} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
       <div className="min-h-screen bg-gray-100 p-4">
         <div className="max-w-4xl mx-auto">
           {/* Sankey Chart */}

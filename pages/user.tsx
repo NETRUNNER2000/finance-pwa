@@ -11,6 +11,8 @@ interface TransactionsProps {
 const User = ({ user, setUser }: TransactionsProps) => {
   const [email, setEmail] = useState(user?.email || '')
   const [loading, setLoading] = useState(false)
+  const [grantEmail, setGrantEmail] = useState('')
+  const [grantLoading, setGrantLoading] = useState(false)
 
   const logout = async () => {
     await supabase.auth.signOut()
@@ -28,6 +30,29 @@ const User = ({ user, setUser }: TransactionsProps) => {
       alert(`Failed to send reset email: ${error.message}`)
     } else {
       alert('Password reset email sent! Check your inbox.')
+    }
+  }
+
+  // --- Grant access to another user ---
+  const grantAccess = async () => {
+    const sanitizedEmail = grantEmail.trim().toLowerCase()
+    if (!sanitizedEmail) return alert('Enter a valid email')
+
+    if (!user) return alert('User not authenticated')
+    setGrantLoading(true)
+
+    const { error } = await supabase.rpc('grant_transaction_access', {
+      p_user_id: user.id,
+      p_target_email: sanitizedEmail
+    })
+
+    setGrantLoading(false)
+
+    if (error) {
+      alert(`Failed to grant access: ${error.message}`)
+    } else {
+      alert(`All transactions shared with ${sanitizedEmail}`)
+      setGrantEmail('')
     }
   }
 
@@ -81,6 +106,31 @@ const User = ({ user, setUser }: TransactionsProps) => {
               {loading ? 'Sending...' : 'Reset Password'}
             </button>
           </div>
+        </div>
+      </Section>
+
+      {/* Grant Transaction Access */}
+      <Section>
+        <h2 className='text-xl font-semibold mb-2'>Share Transactions</h2>
+        <p className='text-zinc-600 dark:text-zinc-400 mb-2'>
+          Enter another user's email to grant them access to all your transactions.
+        </p>
+
+        <div className='flex flex-col sm:flex-row gap-2'>
+          <input
+            type='email'
+            placeholder="User's email"
+            value={grantEmail}
+            onChange={(e) => setGrantEmail(e.target.value.trim())} // sanitize input
+            className='border p-2 rounded text-gray-900'
+          />
+          <button
+            onClick={grantAccess}
+            disabled={grantLoading}
+            className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition'
+          >
+            {grantLoading ? 'Sharing...' : 'Grant Access'}
+          </button>
         </div>
       </Section>
     </Page>

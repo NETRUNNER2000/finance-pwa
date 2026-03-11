@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 export default function App({ Component, pageProps }: AppProps) {
  const [user, setUser] = useState<any>(null)
+ const [selectedAccount, setSelectedAccount] = useState<string | null>(null)
 	
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			defaultTheme='system'
 			disableTransitionOnChange
 		>
-			<Component {...pageProps} user={user} setUser={setUser}  />
+			<Component {...pageProps} user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} />
 		</ThemeProvider>
 	)
 }

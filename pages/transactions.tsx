@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabaseClient'
 interface TransactionsProps {
     user: any // type properly later
     setUser: (user: any) => void
+    selectedAccount?: string | null
+    setSelectedAccount: (account: string | null) => void
 }
 
 interface Transaction {
@@ -13,10 +15,11 @@ interface Transaction {
     amount: number
     category: string
     description?: string
-    transaction_date: string
+    transaction_date: string 
+
 }
 
-const Transactions = ({ user, setUser }: TransactionsProps) => {
+const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: TransactionsProps) => {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [amount, setAmount] = useState('')
     const [category, setCategory] = useState('')
@@ -31,17 +34,24 @@ const Transactions = ({ user, setUser }: TransactionsProps) => {
                 router.push('/login')
             } else {
                 setUser(data.user)
-                fetchTransactions(data.user.id)
+                fetchTransactions()
             }
         }
         getUser()
     }, [])
 
+    useEffect(() => {
+        console.log("selectedAccount:", selectedAccount)
+        fetchTransactions()
+    }, [selectedAccount])
+
     // --- Fetch transactions ---
-    const fetchTransactions = async (userId: string) => {
+    const fetchTransactions = async () => {
+        console.log('Fetching transactions for account:', selectedAccount)
         const { data, error } = await supabase
             .from('transactions')
             .select('*')
+            .eq("user_id", selectedAccount)
             .order('transaction_date', { ascending: false })
 
         if (error) console.error(error)
@@ -79,7 +89,7 @@ const Transactions = ({ user, setUser }: TransactionsProps) => {
             setDescription('')
 
             // Refresh transactions
-            fetchTransactions(user.id)
+            fetchTransactions()
         } catch (err: any) {
             console.error('Add transaction error:', err)
             alert(`Failed to add transaction: ${err.message}`)
@@ -136,7 +146,7 @@ const Transactions = ({ user, setUser }: TransactionsProps) => {
     }
 
     return (
-        <Page title="Transactions" user={user}>
+        <Page title="Transactions" user={user} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
             {/* Add Transaction Form */}
             <div className="bg-white p-6 rounded shadow mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
