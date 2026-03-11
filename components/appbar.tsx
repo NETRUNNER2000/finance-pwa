@@ -9,11 +9,12 @@ const links = [
 
 interface AppbarProps {
   user: any
+  setUser: (user: any) => void
   selectedAccount?: string | null
   setSelectedAccount: (account: string | null) => void
 }
 
-const Appbar = ({ user, selectedAccount, setSelectedAccount }: AppbarProps) => {
+const Appbar = ({ user, setUser, selectedAccount, setSelectedAccount }: AppbarProps) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [sharedAccounts, setSharedAccounts] = useState<string[]>([])
@@ -41,7 +42,7 @@ const Appbar = ({ user, selectedAccount, setSelectedAccount }: AppbarProps) => {
     }
 
     fetchSharedAccounts()
-  }, [user])
+  }, [user, setUser, setSelectedAccount])
 
   return (
     <div className='fixed top-0 left-0 z-20 w-full bg-zinc-900 pt-safe'>

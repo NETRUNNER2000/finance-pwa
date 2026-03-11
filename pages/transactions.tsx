@@ -8,6 +8,7 @@ interface TransactionsProps {
     setUser: (user: any) => void
     selectedAccount?: string | null
     setSelectedAccount: (account: string | null) => void
+    
 }
 
 interface Transaction {
@@ -27,25 +28,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
     const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
     const router = useRouter()
 
-    useEffect(() => {
-        const getUser = async () => {
-            const { data } = await supabase.auth.getUser()
-            if (!data.user) {
-                router.push('/login')
-            } else {
-                setUser(data.user)
-                fetchTransactions()
-            }
-        }
-        getUser()
-    }, [])
-
-    useEffect(() => {
-        console.log("selectedAccount:", selectedAccount)
-        fetchTransactions()
-    }, [selectedAccount])
-
-    // --- Fetch transactions ---
+        // --- Fetch transactions ---
     const fetchTransactions = async () => {
         console.log('Fetching transactions for account:', selectedAccount)
         const { data, error } = await supabase
@@ -57,6 +40,25 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
         if (error) console.error(error)
         else setTransactions(data || [])
     }
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser()
+            if (!data.user) {
+                router.push('/login')
+            } else {
+                setUser(data.user)
+                fetchTransactions()
+            }
+        }
+        getUser()
+    }, [fetchTransactions, router, setUser])
+
+    useEffect(() => {
+        console.log("selectedAccount:", selectedAccount)
+        fetchTransactions()
+    }, [selectedAccount])
+
+
 
     // --- Add transaction with input sanitization ---
     const addTransaction = async (e: React.FormEvent) => {
@@ -146,7 +148,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
     }
 
     return (
-        <Page title="Transactions" user={user} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
+        <Page title="Transactions" user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
             {/* Add Transaction Form */}
             <div className="bg-white p-6 rounded shadow mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>

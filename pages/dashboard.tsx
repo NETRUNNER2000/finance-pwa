@@ -27,6 +27,24 @@ export default function Dashboard({ user, setUser, selectedAccount, setSelectedA
 
   // --- Fetch current user ---
   useEffect(() => {
+      // --- Fetch category totals via stored procedure ---
+    const fetchCategoryTotals = async (userId: string) => {
+      const today = new Date()
+      const year = today.getFullYear()
+      const month = today.getMonth()
+      console.log('Fetching category totals for:', year, month)
+
+      const { data, error } = await supabase.rpc('get_category_totals_by_paymonth', {
+        p_user_id: userId,
+        p_year: year,
+        p_month: month,
+        p_payday: payday
+      })
+
+      if (error) console.error(error)
+      else setCategoryTotals(data || [])
+    console.log('Fetched category totals:', data)
+    }
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
       if (!data.user) router.push('/login')
@@ -36,26 +54,9 @@ export default function Dashboard({ user, setUser, selectedAccount, setSelectedA
       }
     }
     getUser()
-  }, [])
+  }, [payday, router, setUser])
 
-  // --- Fetch category totals via stored procedure ---
-  const fetchCategoryTotals = async (userId: string) => {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = today.getMonth()
-    console.log('Fetching category totals for:', year, month)
 
-    const { data, error } = await supabase.rpc('get_category_totals_by_paymonth', {
-      p_user_id: userId,
-      p_year: year,
-      p_month: month,
-      p_payday: payday
-    })
-
-    if (error) console.error(error)
-    else setCategoryTotals(data || [])
-  console.log('Fetched category totals:', data)
-  }
 
   // --- Sankey chart ---
   useEffect(() => {
@@ -170,7 +171,7 @@ export default function Dashboard({ user, setUser, selectedAccount, setSelectedA
   }, [categoryTotals])
 
   return (
-    <Page title="Dashboard" user={user} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
+    <Page title="Dashboard" user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
       <div className="min-h-screen bg-gray-100 p-4">
         <div className="max-w-4xl mx-auto">
           {/* Sankey Chart */}

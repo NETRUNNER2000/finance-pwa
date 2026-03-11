@@ -6,11 +6,12 @@ interface Props {
 	title?: string
 	children: React.ReactNode
 	user?: any
+	setUser: (user: any) => void
 	selectedAccount?: string | null
 	setSelectedAccount: (account: string | null) => void
 }
 
-const Page = ({ title, children, user, selectedAccount, setSelectedAccount }: Props) => (
+const Page = ({ title, children, user, setUser, selectedAccount, setSelectedAccount }: Props) => (
 	<>
 		{title ? (
 			<Head>
@@ -18,7 +19,7 @@ const Page = ({ title, children, user, selectedAccount, setSelectedAccount }: Pr
 			</Head>
 		) : null}
 
-		<Appbar user={user} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} />
+		<Appbar user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} />
 
 		<main
 			/**

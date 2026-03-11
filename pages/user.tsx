@@ -6,9 +6,11 @@ import { supabase } from '../lib/supabaseClient'
 interface TransactionsProps {
   user: any // type properly later
   setUser: (user: any) => void
+  selectedAccount?: string | null
+  setSelectedAccount: (account: string | null) => void
 }
 
-const User = ({ user, setUser }: TransactionsProps) => {
+const User = ({ user, setUser, selectedAccount, setSelectedAccount }: TransactionsProps) => {
   const [email, setEmail] = useState(user?.email || '')
   const [loading, setLoading] = useState(false)
   const [grantEmail, setGrantEmail] = useState('')
@@ -57,7 +59,7 @@ const User = ({ user, setUser }: TransactionsProps) => {
   }
 
   return (
-    <Page title='User' user={user}>
+    <Page title='User' user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}>
       <Section>
         <h2 className='text-xl font-semibold'>Story</h2>
         <div className='mt-2'>
@@ -113,7 +115,7 @@ const User = ({ user, setUser }: TransactionsProps) => {
       <Section>
         <h2 className='text-xl font-semibold mb-2'>Share Transactions</h2>
         <p className='text-zinc-600 dark:text-zinc-400 mb-2'>
-          Enter another user's email to grant them access to all your transactions.
+          Enter another users email to grant them access to all your transactions.
         </p>
 
         <div className='flex flex-col sm:flex-row gap-2'>
