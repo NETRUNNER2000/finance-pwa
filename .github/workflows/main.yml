@@ -1,33 +1,16 @@
-name: Build APK
-
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  build:
+  pwa_to_apk_job:
     runs-on: ubuntu-latest
-
+    name: My PWA to apk JOB
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v2
+        # Running PWA to apk action for apk generation
+      - name: Running PWA to APK action
+        uses: sharadcodes/pwa-to-apk-action@v1.0.0
         with:
-          node-version: 20
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Build APK
-        run: bubblewrap build --apk --jdkPath $JAVA_HOME
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk
-          path: app-release-signed.apk
+          project-root-folder: "."
+        # This one below is a seperate action which I'm using for releasing apk
+      
