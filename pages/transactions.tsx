@@ -2,13 +2,11 @@ import Page from '@/components/page'
 import { useRouter } from 'next/dist/client/components/navigation'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useUser } from '../context/UserContext'
 
-interface TransactionsProps {
-    user: any // type properly later
-    setUser: (user: any) => void
-    selectedAccount?: string | null
-    setSelectedAccount: (account: string | null) => void
-    
+interface SharedAccount {
+  id: string
+  displayName: string
 }
 
 interface Transaction {
@@ -20,13 +18,15 @@ interface Transaction {
 
 }
 
-const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: TransactionsProps) => {
+const Transactions = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [amount, setAmount] = useState('')
     const [category, setCategory] = useState('')
     const [description, setDescription] = useState('')
     const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
     const router = useRouter()
+
+    const { memoUser, setUser, selectedAccount, setSelectedAccount, sharedAccounts, setSharedAccounts } = useUser()
 
         // --- Fetch transactions ---
     const fetchTransactions = async () => {
@@ -63,7 +63,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
     // --- Add transaction with input sanitization ---
     const addTransaction = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!user) return
+        if (!memoUser) return
 
         const sanitizedCategory = category.trim()
         const sanitizedDescription = description.trim()
@@ -100,7 +100,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
 
     // --- Delete transaction ---
     const deleteTransaction = async (transactionId: string) => {
-        if (!user) return
+        if (!memoUser) return
         if (!confirm('Are you sure you want to delete this transaction?')) return
 
         try {
@@ -122,7 +122,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
     const shareTransaction = async (transactionId: string) => {
         const email = shareEmails[transactionId]?.trim()
         if (!email) return alert("Enter a user's email")
-        if (!user) return
+        if (!memoUser) return
 
         try {
             const { data: partnerUser, error: userError } = await supabase
@@ -148,7 +148,7 @@ const Transactions = ({ user, setUser, selectedAccount, setSelectedAccount }: Tr
     }
 
     return (
-        <Page title="Transactions" user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
+        <Page title="Transactions" >
             {/* Add Transaction Form */}
             <div className="bg-white p-6 rounded shadow mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>

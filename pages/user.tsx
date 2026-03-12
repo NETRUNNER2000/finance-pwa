@@ -2,16 +2,14 @@ import Page from '@/components/page'
 import Section from '@/components/section'
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useUser } from '../context/UserContext'
 
-interface TransactionsProps {
-  user: any // type properly later
-  setUser: (user: any) => void
-  selectedAccount?: string | null
-  setSelectedAccount: (account: string | null) => void
-}
 
-const User = ({ user, setUser, selectedAccount, setSelectedAccount }: TransactionsProps) => {
-  const [email, setEmail] = useState(user?.email || '')
+const User = () => {
+
+  const { memoUser, setUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
+
+  const [email, setEmail] = useState(memoUser?.email || '')
   const [loading, setLoading] = useState(false)
   const [grantEmail, setGrantEmail] = useState('')
   const [grantLoading, setGrantLoading] = useState(false)
@@ -40,14 +38,14 @@ const grantAccess = async () => {
   const sanitizedEmail = grantEmail.trim().toLowerCase()
   if (!sanitizedEmail) return alert('Enter a valid email')
 
-  if (!user) return alert('User not authenticated')
+  if (!memoUser) return alert('User not authenticated')
   setGrantLoading(true)
 
   try {
     // Call the RPC function 'grant_transaction_access'
     const { data, error } = await supabase.rpc('grant_transaction_access', {
       p_user_email: sanitizedEmail,
-      p_grantor_id: user.id
+      p_grantor_id: memoUser.id
     })
 
     if (error) {
@@ -74,7 +72,7 @@ const grantAccess = async () => {
   }
 }
   return (
-    <Page title='User' user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}>
+    <Page title='User'>
 
       <Section>
         <h2 className='text-xl font-semibold mb-2'>Account Actions</h2>

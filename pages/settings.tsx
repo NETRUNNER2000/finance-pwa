@@ -4,17 +4,12 @@ import Page from '@/components/page'
 import Section from '@/components/section'
 import { useState } from 'react'
 import { useSettings } from '../context/SettingsContext'
+import { useUser } from '../context/UserContext'
 
-interface TransactionsProps {
-  user: any
-  setUser: (user: any) => void
-  selectedAccount?: string | null
-  setSelectedAccount: (account: string | null) => void
-}
 
-const Settings = ({ user, setUser, selectedAccount, setSelectedAccount }: TransactionsProps) => {
+const Settings = () => {
   const { settings, updateSettings } = useSettings()
-
+  const { memoUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
   const [localSettings, setLocalSettings] = useState({
     payday: settings.payday || 1,
     interestRate: settings.interestRate || 0,
@@ -34,10 +29,6 @@ const Settings = ({ user, setUser, selectedAccount, setSelectedAccount }: Transa
   return (
     <Page
       title="Settings"
-      user={user}
-      setUser={setUser}
-      selectedAccount={selectedAccount}
-      setSelectedAccount={setSelectedAccount}
     >
       <Section>
         <h2 className="text-xl font-semibold mb-4">Settings</h2>

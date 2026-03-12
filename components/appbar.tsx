@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
 import { useState, useEffect } from 'react'
+import { useUser } from '../context/UserContext'
 
 const links = [
   {label: 'Dashboard', href:"/dashboard"},
@@ -9,31 +10,19 @@ const links = [
   
 ]
 
-interface SharedAccount {
-  id: string
-  displayName: string
-}
 
-interface AppbarProps {
-  user: any
-  setUser: (user: any) => void
-  selectedAccount?: string | null
-  setSelectedAccount: (account: string | null) => void
-  sharedAccounts: SharedAccount[]
-  setSharedAccounts: (accounts: SharedAccount[]) => void
-}
-
-const Appbar = ({ user, setUser, selectedAccount, setSelectedAccount, sharedAccounts, setSharedAccounts }: AppbarProps) => {
+const Appbar = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-
+  const { memoUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
+  useEffect(() => {console.log("User updated:", memoUser)}, [memoUser])
   return (
     <div className='fixed top-0 left-0 z-20 w-full bg-zinc-900 pt-safe'>
       <header className='border-b bg-zinc-100 px-safe dark:border-zinc-800 dark:bg-zinc-900'>
         <div className='mx-auto flex h-20 max-w-screen-md items-center justify-between px-6'>
 
           <Link href='/'>
-            <h1 className='font-medium'>Welcome {user?.displayName}</h1>
+            <h1 className='font-medium'>Welcome {memoUser?.displayName || 'loading...'}</h1>
           </Link>
 
           <nav className='flex items-center space-x-6'>

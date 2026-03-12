@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useUser } from '../context/UserContext'
 import { useRouter } from 'next/router'
 import * as d3 from 'd3'
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
@@ -12,14 +13,12 @@ interface CategoryTotal {
   total: number
 }
 
-interface DashboardProps {
-  user: any
-  setUser: (user: any) => void
-  selectedAccount?: string | null
-  setSelectedAccount: (account: string | null) => void
-}
 
-export default function Dashboard({ user, setUser, selectedAccount, setSelectedAccount }: DashboardProps) {
+
+export default function Dashboard() {
+
+  const { memoUser, setUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
+
   const [categoryTotals, setCategoryTotals] = useState<CategoryTotal[]>([])
   const [payday, setPayday] = useState(25)
   const router = useRouter()
@@ -255,7 +254,7 @@ useEffect(() => {
 
 }, [])
   return (
-    <Page title="Dashboard" user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} >
+    <Page title="Dashboard" >
       <div className="bg-gray-100 p-4 test">
        <div className="max-w-4xl bg-gray-100 mx-auto  test"> {/* full viewport height */}
           {/* Sankey Chart */}
