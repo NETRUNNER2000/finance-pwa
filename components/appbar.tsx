@@ -9,13 +9,18 @@ const links = [
   
 ]
 
+interface SharedAccount {
+  id: string
+  displayName: string
+}
+
 interface AppbarProps {
   user: any
   setUser: (user: any) => void
   selectedAccount?: string | null
   setSelectedAccount: (account: string | null) => void
-  sharedAccounts: string[]
-  setSharedAccounts: (accounts: string[]) => void
+  sharedAccounts: SharedAccount[]
+  setSharedAccounts: (accounts: SharedAccount[]) => void
 }
 
 const Appbar = ({ user, setUser, selectedAccount, setSelectedAccount, sharedAccounts, setSharedAccounts }: AppbarProps) => {
@@ -56,7 +61,7 @@ const Appbar = ({ user, setUser, selectedAccount, setSelectedAccount, sharedAcco
                 onClick={() => setOpen(!open)}
                 className='cursor-pointer h-10 w-28 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-medium text-sm'
               >
-                {selectedAccount || "Select"}
+                Accounts
               </div>
 
               {open && (
@@ -70,27 +75,17 @@ const Appbar = ({ user, setUser, selectedAccount, setSelectedAccount, sharedAcco
 
                   <div className="border-t border-zinc-200 dark:border-zinc-700 my-1"/>
 
-                  <div className="text-xs text-zinc-500 px-2">Select Account</div>
-
-                  {/* Always include the current logged-in user */}
-                  <div
-                    className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-700 rounded cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-700"
-                    onClick={() => { setSelectedAccount(user.id); setOpen(false) }}
-                  >
-                    {user.id} (You)
-                  </div>
-
                   {/* Shared accounts */}
                   {sharedAccounts.length === 0 ? (
                     <div className="text-xs px-2 text-zinc-400">None</div>
                   ) : (
-                    sharedAccounts.map((id) => (
+                    sharedAccounts.map((item) => (
                       <div
-                        key={id}
+                        key={item.id}
                         className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-700 rounded cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-700"
-                        onClick={() => { setSelectedAccount(id); setOpen(false) }}
+                        onClick={() => { setSelectedAccount(item.id); setOpen(false) }}
                       >
-                        {id}
+                        {item.displayName}
                       </div>
                     ))
                   )}

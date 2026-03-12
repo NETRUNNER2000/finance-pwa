@@ -5,63 +5,103 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 interface Props {
-	title?: string
-	children: React.ReactNode
-	user?: any
-	setUser: (user: any) => void
-	selectedAccount?: string | null
-	setSelectedAccount: (account: string | null) => void
+  title?: string
+  children: React.ReactNode
+  user?: any
+  setUser: (user: any) => void
+  selectedAccount?: string | null
+  setSelectedAccount: (account: string | null) => void
 }
 
-const Page = ({ title, children, user, setUser, selectedAccount, setSelectedAccount }: Props) => 
-{
-	const [sharedAccounts, setSharedAccounts] = useState<string[]>([])
-	
-	useEffect(() => {
+interface SharedAccount {
+  id: string
+  displayName: string
+}
+
+const Page = ({
+  title,
+  children,
+  user,
+  setUser,
+  selectedAccount,
+  setSelectedAccount
+}: Props) => {
+  const [sharedAccounts, setSharedAccounts] = useState<SharedAccount[]>([])
+
+  useEffect(() => {
     if (!user?.id) return
 
     const fetchSharedAccounts = async () => {
+      // 1️⃣ Fetch all owner_ids that the user can view
+      const { data: permissions, error: permError } = await supabase
+        .from('transaction_permissions')
+        .select('owner_id')
+        .eq('viewer_id', user.id)
 
-      const { data, error } = await supabase
-        .from("transaction_permissions")
-        .select("owner_id")
-        .eq("viewer_id", user.id)
-
-      if (error) {
-        console.error(error)
+      if (permError) {
+        console.error('Error fetching permissions:', permError)
         return
       }
-      const ids = data.map((row: any) => row.owner_id)
-      setSharedAccounts(ids)
-	  console.log('Fetched shared accounts:', ids)
-      // default selected account to self
+
+      const ownerIds = permissions.map((row: any) => row.owner_id)
+
+      // Always include the logged-in user's own id
+      if (!ownerIds.includes(user.id)) ownerIds.unshift(user.id)
+
+      // 2️⃣ Fetch display names from profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', ownerIds)
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError)
+        return
+      }
+
+      // 3️⃣ Map to SharedAccount objects
+      const accounts: SharedAccount[] = ownerIds.map((id: string) => {
+        if (id === user.id) return { id, displayName: 'You' } // Show "You" for logged-in user
+        const profile = profiles.find(p => p.id === id)
+        return { id, displayName: profile?.display_name || 'Unknown' }
+      })
+
+      setSharedAccounts(accounts)
+      console.log('Fetched shared accounts:', accounts)
+
+      // Default selected account to self
       setSelectedAccount(user.id)
     }
+
     fetchSharedAccounts()
-  }, [setSelectedAccount, user])
-	
-	return (
-	<>
-		{title ? (
-			<Head>
-				<title>Rice Bowl | {title}</title>
-			</Head>
-		) : null}
+  }, [user, setSelectedAccount])
 
-		<Appbar user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount} sharedAccounts={sharedAccounts} setSharedAccounts={setSharedAccounts} />
+  return (
+    <>
+      {title && (
+        <Head>
+          <title>Rice Bowl | {title}</title>
+        </Head>
+      )}
 
-		<main
-			/**
-			 * Padding top = `appbar` height
-			 * Padding bottom = `bottom-nav` height
-			 */
-			className='mx-auto max-w-screen-md pt-20 pb-16 px-safe sm:pb-0'
-		>
-			<div className='p-6'>{children}</div>
-		</main>
+      <Appbar
+        user={user}
+        setUser={setUser}
+        selectedAccount={selectedAccount}
+        setSelectedAccount={setSelectedAccount}
+        sharedAccounts={sharedAccounts}
+        setSharedAccounts={setSharedAccounts}
+      />
 
-		<BottomNav />
-	</>
-	)
+      <main
+        className="mx-auto max-w-screen-md pt-20 pb-16 px-safe sm:pb-0"
+      >
+        <div className="p-6">{children}</div>
+      </main>
+
+      <BottomNav />
+    </>
+  )
 }
+
 export default Page
