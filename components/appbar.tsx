@@ -55,7 +55,7 @@ const Appbar = () => {
                 onClick={() => setOpen(!open)}
                 className='cursor-pointer h-10 w-28 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-medium text-sm'
               >
-                Accounts
+                {sharedAccounts.find(a => a.id === selectedAccount)?.displayName || 'Select Account'}
               </div>
 
               {open && (
