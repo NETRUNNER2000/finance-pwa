@@ -68,6 +68,9 @@ export default function Dashboard({ user, setUser, selectedAccount, setSelectedA
     const netIncome = grossIncome - tax - uif - pension
 
     const categories = categoryTotals.map(c => c.category)
+    const categoryColor = d3.scaleOrdinal<string>()
+  .domain(categories)
+  .range(d3.schemeObservable10)
     const categorySums: Record<string, number> = {}
     categoryTotals.forEach(c => (categorySums[c.category] = c.total))
     const spentTotal = Object.values(categorySums).reduce((a, b) => a + b, 0)
@@ -127,8 +130,11 @@ const g = svg.append('g')
         const name = (d.target as SankeyNode).name
         if (name.startsWith('Tax')) return '#ef4444'
         if (name.startsWith('UIF')) return '#fbbf24'
+        if (name.startsWith('Remaining')) return '#22c55e'
         if (name.startsWith('Pension')) return '#f97316'
-        return '#4f46e5'
+        const categoryName = name.split(' [')[0]
+        return categoryColor(categoryName)
+        
       })
       .attr('stroke-width', d => Math.max(1, d.width || 1))
       .attr('fill', 'none')
@@ -150,7 +156,9 @@ const g = svg.append('g')
         if (d.name.startsWith('Tax')) return '#ef4444'
         if (d.name.startsWith('UIF')) return '#fbbf24'
         if (d.name.startsWith('Pension')) return '#f97316'
-        return '#2563eb'
+        const categoryName = d.name.split(' [')[0]
+        return categoryColor(categoryName)
+
       })
 
     // Node labels
@@ -166,10 +174,90 @@ const g = svg.append('g')
       .style('font-size', '12px')
   }, [categoryTotals])
 
+  // Add this inside your Dashboard component, after the Sankey useEffect
+
+const lineChartRef = useRef<SVGSVGElement | null>(null)
+
+useEffect(() => {
+  if (!lineChartRef.current) return
+
+  const svg = d3.select(lineChartRef.current)
+  svg.selectAll('*').remove()
+
+  const width = 600
+  const height = 220
+  const margin = { top: 20, right: 20, bottom: 30, left: 40 }
+
+  const months = ['Oct','Nov','Dec','Jan','Feb','Mar']
+
+  const dataset = [
+    { name: "Food", values: [1200,1500,900,1800,1700,2000] },
+    { name: "Transport", values: [600,800,700,900,850,1000] },
+    { name: "Entertainment", values: [400,500,450,600,650,700] }
+  ]
+
+  const x = d3.scalePoint()
+    .domain(months)
+    .range([margin.left, width - margin.right])
+
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(dataset.flatMap(d => d.values))!])
+    .nice()
+    .range([height - margin.bottom, margin.top])
+
+  const color = d3.scaleOrdinal<string>()
+    .domain(dataset.map(d => d.name))
+    .range(["#6366f1","#22c55e","#f59e0b"])
+
+  const line = d3.line<number>()
+    .x((d,i) => x(months[i])!)
+    .y(d => y(d))
+    .curve(d3.curveMonotoneX)
+
+  const area = d3.area<number>()
+    .x((d,i) => x(months[i])!)
+    .y0(height - margin.bottom)
+    .y1(d => y(d))
+    .curve(d3.curveMonotoneX)
+
+  // draw areas first
+  dataset.forEach(series => {
+    svg.append("path")
+      .datum(series.values)
+      .attr("fill", color(series.name) as string)
+      .attr("opacity", 0.2)
+      .attr("d", area)
+  })
+
+  // draw lines
+  dataset.forEach(series => {
+    svg.append("path")
+      .datum(series.values)
+      .attr("fill", "none")
+      .attr("stroke", color(series.name) as string)
+      .attr("stroke-width", 2)
+      .attr("d", line)
+  })
+
+  // axes
+  svg.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x))
+
+  svg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y))
+
+  svg
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .style("width", "100%")
+    .style("height", "auto")
+
+}, [])
   return (
     <Page title="Dashboard" user={user} setUser={setUser} selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}>
-      <div className="min-h-screen bg-gray-100 p-4 test">
-       <div className="max-w-4xl bg-gray-100 mx-auto h-screen test"> {/* full viewport height */}
+      <div className="bg-gray-100 p-4 test">
+       <div className="max-w-4xl bg-gray-100 mx-auto  test"> {/* full viewport height */}
           {/* Sankey Chart */}
           <div className="sankey-container h-full flex flex-col"> {/* full height and flex for heading + chart */}
             <h2 className="text-xl font-semibold text-white mb-4 flex-none">Transactions Sankey</h2>
@@ -181,28 +269,38 @@ const g = svg.append('g')
       {/* Responsive Sankey CSS */}
       <style jsx>{`
       .test{
-      background-color: #f9f9fb00 !important;}
+        background-color: #f9f9fb00 !important;
+        height: auto;
+      }
         .sankey-container {
           width: 100%;
           overflow-x: auto;
-          height: 100%;
+         
           overflow: hidden; /* TURN OFF ALL SCROLLING */
+          
         }
 
         .sankey-container svg {
           width: 100%;
-          height: auto;
+         
           transform-origin: top left;
           transform: scale(1);
         }
 
         @media (max-width: 640px) {
           .sankey-container svg {
+          margin-bottom: 60px;
             transform: scale(1.1); /* zoom 1.5x on mobile */
           }
           
         }
       `}</style>
+
+      {/* Simple line chart */}
+<div className="linechart-container mt-8">
+  <h2 className="text-xl font-semibold text-white mb-4">Dummy Line Chart</h2>
+  <svg ref={lineChartRef}></svg>
+</div>
     </Page>
   )
 }
