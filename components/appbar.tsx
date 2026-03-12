@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
@@ -14,8 +15,12 @@ const links = [
 const Appbar = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { memoUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
-  useEffect(() => {console.log("User updated:", memoUser)}, [memoUser])
+  const { memoUser, setUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
+  useEffect(() => {
+    console.log("User updated:", memoUser)
+    setUser(memoUser)
+  }, [memoUser, setUser])
+  
   return (
     <div className='fixed top-0 left-0 z-20 w-full bg-zinc-900 pt-safe'>
       <header className='border-b bg-zinc-100 px-safe dark:border-zinc-800 dark:bg-zinc-900'>
