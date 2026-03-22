@@ -15,7 +15,10 @@ const Settings = () => {
     payday: settings.payday || 1,
     interestRate: settings.interestRate || 0,
     investmentBalance: settings.investmentBalance || 0,
-    linechartInterval: settings.linechartInterval || 'monthly'
+    linechartInterval: settings.linechartInterval || 'monthly',
+    monthlyTax: settings.monthlyTax || 0,
+    monthlyUIF: settings.monthlyUIF || 0,
+    monthlyPension: settings.monthlyPension || 0
   })
 
   const handleChange = (key: string, value: any) => {
@@ -43,6 +46,39 @@ const Settings = () => {
               min={0}
               value={localSettings.grossIncome}
               onChange={e => handleChange('grossIncome', parseInt(e.target.value))}
+              className="border p-2 rounded w-full"
+            />
+          </div>
+
+           <div>
+            <label className="block font-medium mb-1">Monthly Tax</label>
+            <input
+              type="number"
+              min={0}
+              value={localSettings.monthlyTax}
+              onChange={e => handleChange('monthlyTax', parseInt(e.target.value))}
+              className="border p-2 rounded w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Monthly UIF</label>
+            <input
+              type="number"
+              min={0}
+              value={localSettings.monthlyUIF}
+              onChange={e => handleChange('monthlyUIF', parseInt(e.target.value))}
+              className="border p-2 rounded w-full"
+            />
+          </div>
+
+                    <div>
+            <label className="block font-medium mb-1">Monthly Pension</label>
+            <input
+              type="number"
+              min={0}
+              value={localSettings.monthlyPension}
+              onChange={e => handleChange('monthlyPension', parseInt(e.target.value))}
               className="border p-2 rounded w-full"
             />
           </div>

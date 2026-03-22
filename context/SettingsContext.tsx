@@ -9,7 +9,10 @@ type Settings = {
   payday: number
   interestRate: number
   investmentBalance: number
-  linechartInterval: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  linechartInterval: 'daily' | 'weekly' | 'monthly' | 'yearly',
+  monthlyTax: number
+  monthlyUIF: number,
+  monthlyPension: number
 }
 
 type SettingsContextType = {
@@ -25,6 +28,9 @@ const defaultSettings: Settings = {
   interestRate: 0,
   investmentBalance: 0,
   linechartInterval: 'monthly',
+  monthlyTax: 0,
+  monthlyUIF: 0,
+  monthlyPension: 0
 }
 
 const SettingsContext = createContext<SettingsContextType>({

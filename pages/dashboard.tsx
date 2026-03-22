@@ -43,6 +43,7 @@ export default function Dashboard() {
 
     if (error) console.error(error)
     else setCategoryTotals(data || [])
+  console.log('Category totals: ', data)
   }, [settings.payday])
 
   // Fetch last 12 months totals for Line Chart
@@ -76,9 +77,9 @@ export default function Dashboard() {
     const margin = { top: 20, right: 140, bottom: 20, left: 20 }
 
     const grossIncome = settings.grossIncome
-    const tax = 5300
-    const uif = 177
-    const pension = 582
+    const tax = settings.monthlyTax
+    const uif = settings.monthlyUIF
+    const pension = settings.monthlyPension
     const netIncome = grossIncome - tax - uif - pension
 
     const expenseSums: Record<string, number> = {}
