@@ -99,35 +99,47 @@ export default function Dashboard() {
       .domain([...expenseCategories, ...incomeCategories])
       .range(d3.schemeTableau10)
 
-    const nodes = [
-      { name: 'Gross [Gross Income]' },       
-      { name: `Tax [${tax}]` },               
-      { name: `UIF [${uif}]` },               
-      { name: `Pension [${pension}]` },       
-      { name: `Net [${netIncome}]` },         
-      ...incomeCategories.map(c => ({ name: `${c} [${incomeSums[c]}]` })),  
-      ...expenseCategories.map(c => ({ name: `${c} [${expenseSums[c]}]` })), 
-      { name: `Remaining [${remaining}]` }   
-    ]
+    const nodes: { name: string }[] = [{ name: 'Gross [Gross Income]' }]
 
-    const grossIndex = 0
-    const taxIndex = 1
-    const uifIndex = 2
-    const pensionIndex = 3
-    const netIndex = 4
-    const incomeStartIndex = 5
-    const expenseStartIndex = incomeStartIndex + incomeCategories.length
-    const remainingIndex = nodes.length - 1
+const links: { source: number; target: number; value: number }[] = []
 
-    const links = []
-    links.push({ source: grossIndex, target: taxIndex, value: tax })
-    links.push({ source: grossIndex, target: uifIndex, value: uif })
-    links.push({ source: grossIndex, target: pensionIndex, value: pension })
-    links.push({ source: grossIndex, target: netIndex, value: netIncome })
+// Optional deductions
+let nextNodeIndex = 1
+const deductions = [
+  { name: `Tax [${tax}]`, value: tax },
+  { name: `UIF [${uif}]`, value: uif },
+  { name: `Pension [${pension}]`, value: pension },
+]
 
-    incomeCategories.forEach((c,i)=>{ links.push({ source: incomeStartIndex+i, target: netIndex, value: incomeSums[c] }) })
-    expenseCategories.forEach((c,i)=>{ links.push({ source: netIndex, target: expenseStartIndex+i, value: expenseSums[c] }) })
-    links.push({ source: netIndex, target: remainingIndex, value: remaining })
+deductions.forEach(d => {
+  if (d.value > 0) {
+    nodes.push({ name: d.name })
+    links.push({ source: 0, target: nextNodeIndex, value: d.value })
+    nextNodeIndex++
+  }
+})
+
+// Net income node
+nodes.push({ name: `Net [${netIncome}]` })
+const netIndex = nodes.length - 1
+
+// Link from Gross → Net if any deductions exist, or directly from Gross
+links.push({ source: 0, target: netIndex, value: netIncome })
+
+// Income categories
+const incomeStartIndex = nodes.length
+incomeCategories.forEach(c => nodes.push({ name: `${c} [${incomeSums[c]}]` }))
+incomeCategories.forEach((c, i) => links.push({ source: incomeStartIndex + i, target: netIndex, value: incomeSums[c] }))
+
+// Expense categories
+const expenseStartIndex = nodes.length
+expenseCategories.forEach(c => nodes.push({ name: `${c} [${expenseSums[c]}]` }))
+expenseCategories.forEach((c, i) => links.push({ source: netIndex, target: expenseStartIndex + i, value: expenseSums[c] }))
+
+// Remaining
+nodes.push({ name: `Remaining [${remaining}]` })
+const remainingIndex = nodes.length - 1
+links.push({ source: netIndex, target: remainingIndex, value: remaining })
 
     interface SankeyNode { name: string; x0?: number; x1?: number; y0?: number; y1?: number }
     interface SankeyLink { source: number; target: number; value: number; width?: number }
