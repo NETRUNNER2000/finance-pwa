@@ -32,6 +32,8 @@ const Transactions = () => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
+  const [showFilters, setShowFilters] = useState(false)
+
   // At the top of Transactions component
 useEffect(() => {
   const { category } = router.query
@@ -210,8 +212,19 @@ useEffect(() => {
           </button>
         </form>
       </div>
+{/* Mobile toggle */}
+<div className="sm:hidden mb-2">
+  <button
+    onClick={() => setShowFilters(prev => !prev)}
+    className="bg-gray-700 text-white px-3 py-1 rounded"
+  >
+    {showFilters ? 'Hide Filters' : 'Show Filters'}
+  </button>
+</div>
 
-      {/* Filters */}
+<div className={`bg-white p-4 rounded shadow mb-4
+                 ${!showFilters ? 'hidden sm:block' : 'block'}`}>
+        {/* Filters */}
       <div className="bg-white p-4 rounded shadow mb-4">
         <h3 className="text-lg font-semibold mb-3 text-gray-800">Filters</h3>
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
@@ -270,6 +283,8 @@ useEffect(() => {
           Reset Filters
         </button>
       </div>
+
+</div>
 
       {/* Transactions List */}
       <div className="bg-white p-6 rounded shadow">
