@@ -53,7 +53,7 @@ const Transactions = () => {
   }, [selectedAccount])
 
   // --- Add transaction ---
-  const addTransaction = async (e: React.FormEvent) => {
+  const addTransaction = async (e: React.FormEvent, transactionType: string) => {
     e.preventDefault()
     if (!memoUser || !selectedAccount) return
 
@@ -72,7 +72,7 @@ const Transactions = () => {
           amount: parsedAmount,
           category: sanitizedCategory,
           description: sanitizedDescription || null,
-          transaction_type: 'expense'
+          transaction_type: transactionType
         },
       ])
       if (error) throw error
@@ -179,7 +179,7 @@ const Transactions = () => {
           />
           <button
             type="submit"
-            onClick={addTransaction}
+            onClick={(e) => addTransaction(e, 'expense')}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition col-span-full sm:col-auto"
           >
             Add Expense
@@ -187,7 +187,7 @@ const Transactions = () => {
           
           <button
             type="submit"
-            onClick={()=> alert("Functionality Loading!")}
+            onClick={(e) => addTransaction(e, 'income')}
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition col-span-full sm:col-auto"
           >
             Add Income
