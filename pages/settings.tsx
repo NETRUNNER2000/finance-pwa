@@ -2,38 +2,57 @@
 
 import Page from '@/components/page'
 import Section from '@/components/section'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSettings } from '../context/SettingsContext'
 import { useUser } from '../context/UserContext'
 
-
 const Settings = () => {
-  const { settings, updateSettings } = useSettings()
-  const { memoUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
+  const { settings, updateSettings, refreshSettings } = useSettings()
+  const { selectedAccount } = useUser()
+
   const [localSettings, setLocalSettings] = useState({
-    grossIncome: settings.grossIncome || 0,
-    payday: settings.payday || 1,
-    interestRate: settings.interestRate || 0,
-    investmentBalance: settings.investmentBalance || 0,
-    linechartInterval: settings.linechartInterval || 'monthly',
-    monthlyTax: settings.monthlyTax || 0,
-    monthlyUIF: settings.monthlyUIF || 0,
-    monthlyPension: settings.monthlyPension || 0
+    grossIncome: 0,
+    payday: 1,
+    interestRate: 0,
+    investmentBalance: 0,
+    linechartInterval: 'monthly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+    monthlyTax: 0,
+    monthlyUIF: 0,
+    monthlyPension: 0
   })
+
+  // 🔑 SYNC when settings OR account changes
+  useEffect(() => {
+    if (!selectedAccount) return
+
+    setLocalSettings({
+      grossIncome: settings.grossIncome || 0,
+      payday: settings.payday || 1,
+      interestRate: settings.interestRate || 0,
+      investmentBalance: settings.investmentBalance || 0,
+      linechartInterval: settings.linechartInterval || 'monthly',
+      monthlyTax: settings.monthlyTax || 0,
+      monthlyUIF: settings.monthlyUIF || 0,
+      monthlyPension: settings.monthlyPension || 0
+    })
+  }, [settings, selectedAccount])
 
   const handleChange = (key: string, value: any) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }))
   }
 
-  const handleSave = () => {
-    updateSettings(localSettings)
+  const handleSave = async () => {
+    await updateSettings(localSettings)
     alert('Settings saved!')
   }
 
+  const handleRefresh = async () => {
+    await refreshSettings()
+    alert('Settings refreshed from server!')
+  }
+
   return (
-    <Page
-      title="Settings"
-    >
+    <Page title="Settings">
       <Section>
         <h2 className="text-xl font-semibold mb-4">Settings</h2>
 
@@ -45,18 +64,18 @@ const Settings = () => {
               type="number"
               min={0}
               value={localSettings.grossIncome}
-              onChange={e => handleChange('grossIncome', parseInt(e.target.value))}
+              onChange={e => handleChange('grossIncome', parseInt(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
 
-           <div>
+          <div>
             <label className="block font-medium mb-1">Monthly Tax</label>
             <input
               type="number"
               min={0}
               value={localSettings.monthlyTax}
-              onChange={e => handleChange('monthlyTax', parseInt(e.target.value))}
+              onChange={e => handleChange('monthlyTax', parseInt(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
@@ -67,18 +86,18 @@ const Settings = () => {
               type="number"
               min={0}
               value={localSettings.monthlyUIF}
-              onChange={e => handleChange('monthlyUIF', parseInt(e.target.value))}
+              onChange={e => handleChange('monthlyUIF', parseInt(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
 
-                    <div>
+          <div>
             <label className="block font-medium mb-1">Monthly Pension</label>
             <input
               type="number"
               min={0}
               value={localSettings.monthlyPension}
-              onChange={e => handleChange('monthlyPension', parseInt(e.target.value))}
+              onChange={e => handleChange('monthlyPension', parseInt(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
@@ -90,7 +109,7 @@ const Settings = () => {
               min={1}
               max={31}
               value={localSettings.payday}
-              onChange={e => handleChange('payday', parseInt(e.target.value))}
+              onChange={e => handleChange('payday', parseInt(e.target.value) || 1)}
               className="border p-2 rounded w-full"
             />
           </div>
@@ -101,18 +120,20 @@ const Settings = () => {
               type="number"
               step={0.01}
               value={localSettings.interestRate}
-              onChange={e => handleChange('interestRate', parseFloat(e.target.value))}
+              onChange={e => handleChange('interestRate', parseFloat(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
 
           <div>
-            <label className="block font-medium mb-1">Investment Account Balance (Start of Month)</label>
+            <label className="block font-medium mb-1">
+              Investment Account Balance (Start of Month)
+            </label>
             <input
               type="number"
               step={0.01}
               value={localSettings.investmentBalance}
-              onChange={e => handleChange('investmentBalance', parseFloat(e.target.value))}
+              onChange={e => handleChange('investmentBalance', parseFloat(e.target.value) || 0)}
               className="border p-2 rounded w-full"
             />
           </div>
@@ -131,12 +152,21 @@ const Settings = () => {
             </select>
           </div>
 
-          <button
-            onClick={handleSave}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Save Settings
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Save Settings
+            </button>
+
+            <button
+              onClick={handleRefresh}
+              className="mt-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+            >
+              Refresh
+            </button>
+          </div>
 
         </div>
       </Section>

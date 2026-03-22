@@ -17,11 +17,7 @@ interface Transaction {
 
 const Transactions = () => {
   const router = useRouter()
-  const {
-    memoUser,
-    setUser,
-    selectedAccount,
-  } = useUser()
+  const { memoUser, selectedAccount } = useUser()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [amount, setAmount] = useState('')
@@ -29,12 +25,17 @@ const Transactions = () => {
   const [description, setDescription] = useState('')
   const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
 
+  // --- Filters ---
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [minAmount, setMinAmount] = useState('')
+  const [maxAmount, setMaxAmount] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
-  // --- Fetch transactions when selectedAccount exists ---
+  // --- Fetch transactions ---
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!selectedAccount) return
-      console.log('Fetching transactions for account:', selectedAccount)
 
       const { data, error } = await supabase
         .from('transactions')
@@ -42,11 +43,8 @@ const Transactions = () => {
         .eq('user_id', selectedAccount)
         .order('transaction_date', { ascending: false })
 
-      if (error) {
-        console.error('Fetch transactions error:', error)
-      } else {
-        setTransactions(data || [])
-      }
+      if (error) console.error('Fetch transactions error:', error)
+      else setTransactions(data || [])
     }
 
     fetchTransactions()
@@ -77,12 +75,10 @@ const Transactions = () => {
       ])
       if (error) throw error
 
-      // Reset form
       setAmount('')
       setCategory('')
       setDescription('')
 
-      // Refresh transactions
       const { data } = await supabase
         .from('transactions')
         .select('*')
@@ -145,15 +141,29 @@ const Transactions = () => {
     }
   }
 
+  // --- Derived: unique categories for filter ---
+  const categories = Array.from(new Set(transactions.map(t => t.category)))
+
+  // --- Filtered transactions ---
+  const filteredTransactions = transactions.filter(t => {
+    const amountVal = t.amount
+    const dateVal = new Date(t.transaction_date)
+
+    if (selectedCategory !== 'all' && t.category !== selectedCategory) return false
+    if (minAmount && amountVal < parseFloat(minAmount)) return false
+    if (maxAmount && amountVal > parseFloat(maxAmount)) return false
+    if (startDate && dateVal < new Date(startDate)) return false
+    if (endDate && dateVal > new Date(endDate)) return false
+
+    return true
+  })
+
   return (
     <Page title="Transactions">
       {/* Add Transaction Form */}
       <div className="bg-white p-6 rounded shadow mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
-        <form
-          
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
-        >
+        <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
           <input
             type="number"
             placeholder="Amount"
@@ -184,7 +194,6 @@ const Transactions = () => {
           >
             Add Expense
           </button>
-          
           <button
             type="submit"
             onClick={(e) => addTransaction(e, 'income')}
@@ -195,14 +204,74 @@ const Transactions = () => {
         </form>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white p-4 rounded shadow mb-4">
+        <h3 className="text-lg font-semibold mb-3 text-gray-800">Filters</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+          {/* Category */}
+          <select
+            value={selectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
+            className="border p-2 rounded text-gray-900"
+          >
+            <option value="all">All Categories</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          {/* Min Amount */}
+          <input
+            type="number"
+            placeholder="Min Amount"
+            value={minAmount}
+            onChange={e => setMinAmount(e.target.value)}
+            className="border p-2 rounded text-gray-900"
+          />
+          {/* Max Amount */}
+          <input
+            type="number"
+            placeholder="Max Amount"
+            value={maxAmount}
+            onChange={e => setMaxAmount(e.target.value)}
+            className="border p-2 rounded text-gray-900"
+          />
+          {/* Start Date */}
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="border p-2 rounded text-gray-900"
+          />
+          {/* End Date */}
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="border p-2 rounded text-gray-900"
+          />
+        </div>
+        <button
+          onClick={() => {
+            setSelectedCategory('all')
+            setMinAmount('')
+            setMaxAmount('')
+            setStartDate('')
+            setEndDate('')
+          }}
+          className="mt-3 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+        >
+          Reset Filters
+        </button>
+      </div>
+
       {/* Transactions List */}
       <div className="bg-white p-6 rounded shadow">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Transactions</h2>
-        {transactions.length === 0 ? (
-          <p className="text-gray-500">No transactions yet</p>
+        {filteredTransactions.length === 0 ? (
+          <p className="text-gray-500">No transactions found</p>
         ) : (
           <ul className="space-y-4">
-            {transactions.map(t => (
+            {filteredTransactions.map(t => (
               <li
                 key={t.id}
                 className="border p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-50"
@@ -210,7 +279,6 @@ const Transactions = () => {
                 <div className="text-gray-900">
                   {`${t.transaction_type} `}<strong>{t.category}</strong>: ${t.amount.toFixed(2)}
                   {t.description && ` — ${t.description}`}
-                  
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
                   <input
