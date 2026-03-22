@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 type Settings = {
   darkMode: boolean
   language: string
+  grossIncome: number,
   payday: number
   interestRate: number
   investmentBalance: number
@@ -19,6 +20,7 @@ type SettingsContextType = {
 const defaultSettings: Settings = {
   darkMode: false,
   language: 'en',
+  grossIncome: 0,
   payday: 25,
   interestRate: 0,
   investmentBalance: 0,

@@ -30,32 +30,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null)
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null)
   const [sharedAccounts, setSharedAccounts] = useState<SharedAccount[]>([])
-const memoUser = useMemo(() => user, [user?.id, user?.displayName])
-const [fetched, setFetched] = useState(false);
+  const memoUser = useMemo(() => user, [user?.id, user?.displayName])
+  const [fetched, setFetched] = useState(false);
 
-useEffect(() => {
-  if (fetched) return;
+  useEffect(() => {
+    if (fetched) return;
 
-  const fetchUserAndProfile = async () => {
-    const { data: authData } = await supabase.auth.getUser()
-    const authUser = authData.user
-    if (!authUser) return
+    const fetchUserAndProfile = async () => {
+      const { data: authData } = await supabase.auth.getUser()
+      const authUser = authData.user
+      if (!authUser) return
 
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('display_name')
-      .eq('id', authUser.id)
-      .single()
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', authUser.id)
+        .single()
 
-    if (profileError) console.error(profileError)
+      if (profileError) console.error(profileError)
 
-    setUser({ ...authUser, displayName: profileData?.display_name || '' })
-    setSelectedAccount(authUser.id)
-    setFetched(true)
-  }
+      setUser({ ...authUser, displayName: profileData?.display_name || '' })
+      setSelectedAccount(authUser.id)
+      setFetched(true)
+    }
 
-  fetchUserAndProfile()
-}, []) // empty dependency array ensures this runs only once
+    fetchUserAndProfile()
+  }, []) // empty dependency array ensures this runs only once
 
   // 2️⃣ Fetch shared accounts once user exists
   useEffect(() => {

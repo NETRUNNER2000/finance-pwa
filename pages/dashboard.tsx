@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useUser } from '../context/UserContext'
+import { useSettings } from '../context/SettingsContext'
 import { useRouter } from 'next/router'
 import * as d3 from 'd3'
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
@@ -18,9 +19,9 @@ interface CategoryTotal {
 export default function Dashboard() {
 
   const { memoUser, setUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
-
+  const {settings, updateSettings} = useSettings()
   const [categoryTotals, setCategoryTotals] = useState<CategoryTotal[]>([])
-  const [payday, setPayday] = useState(25)
+  
   const router = useRouter()
   const sankeyRef = useRef<SVGSVGElement | null>(null)
 
@@ -36,14 +37,14 @@ export default function Dashboard() {
       p_user_id: userId,
       p_year: year,
       p_month: month,
-      p_payday: payday
+      p_payday: settings.payday
     })
 
     if (error) console.error(error)
     else setCategoryTotals(data || [])
 
     console.log('Fetched category totals:', data)
-  }, [payday])
+  }, [settings.payday])
 
   useEffect(() => {
     if (!selectedAccount) return
@@ -60,7 +61,7 @@ export default function Dashboard() {
     const layoutHeight = 400
     const margin = { top: 20, right: 140, bottom: 20, left: 20 }
 
-    const grossIncome = 29000
+    const grossIncome = settings.grossIncome
     const tax = 5300
     const uif = 177
     const pension = 582

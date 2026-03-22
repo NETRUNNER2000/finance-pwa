@@ -11,6 +11,7 @@ const Settings = () => {
   const { settings, updateSettings } = useSettings()
   const { memoUser, selectedAccount, setSelectedAccount, sharedAccounts } = useUser()
   const [localSettings, setLocalSettings] = useState({
+    grossIncome: settings.grossIncome || 0,
     payday: settings.payday || 1,
     interestRate: settings.interestRate || 0,
     investmentBalance: settings.investmentBalance || 0,
@@ -34,6 +35,17 @@ const Settings = () => {
         <h2 className="text-xl font-semibold mb-4">Settings</h2>
 
         <div className="space-y-4">
+
+          <div>
+            <label className="block font-medium mb-1">Gross Income</label>
+            <input
+              type="number"
+              min={0}
+              value={localSettings.grossIncome}
+              onChange={e => handleChange('grossIncome', parseInt(e.target.value))}
+              className="border p-2 rounded w-full"
+            />
+          </div>
 
           <div>
             <label className="block font-medium mb-1">Payday (1–31)</label>

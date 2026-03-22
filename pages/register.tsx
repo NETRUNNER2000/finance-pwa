@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -72,6 +73,8 @@ export default function Register() {
       >
         Create Account
       </button>
+
+      <Link href='/login'>Already a user? Login!</Link>
     </div>
   )
 }
