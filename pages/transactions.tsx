@@ -32,6 +32,13 @@ const Transactions = () => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
+  // At the top of Transactions component
+useEffect(() => {
+  const { category } = router.query
+  if (category && typeof category === 'string') {
+    setSelectedCategory(category)
+  }
+}, [router.query])
   // --- Fetch transactions ---
   useEffect(() => {
     const fetchTransactions = async () => {

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
+import { useRouter } from 'next/router'
 
 interface CategoryTotal {
   category: string
@@ -22,7 +23,7 @@ interface SankeyChartProps {
 
 export default function SankeyChart({ categoryTotals, settings }: SankeyChartProps) {
   const sankeyRef = useRef<SVGSVGElement | null>(null)
-
+  const router = useRouter()
   useEffect(() => {
     if (!sankeyRef.current) return
     const svg = d3.select(sankeyRef.current)
@@ -111,6 +112,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
 
     const g = svg.append('g').attr('transform', `translate(0, ${margin.top})`)
 
+    //Links
     g.append('g')
       .selectAll('path')
       .data(sankeyLinks)
@@ -130,6 +132,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       .attr('fill','none')
       .attr('opacity',0.5)
 
+    // Nodes
     g.append('g')
       .selectAll('rect')
       .data(sankeyNodes)
@@ -148,6 +151,12 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
         if (incomeCategories.some(c=>d.name.startsWith(c))) return '#10b981'
         const categoryName = d.name.split(' [')[0]
         return categoryColor(categoryName)
+      }).style('cursor', 'pointer')
+      .on('click', (event, d) => {
+        // Strip out any " [number]" part of the name
+        const categoryName = d.name.replace(/\s*\[\d+\]$/, '')
+        // Navigate to transactions page with category filter
+        router.push(`/transactions?category=${encodeURIComponent(categoryName)}`)
       })
 
     g.append('g')
