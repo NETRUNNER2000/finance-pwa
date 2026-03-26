@@ -1,5 +1,3 @@
-'use client'
-
 import Page from '@/components/page'
 import Section from '@/components/section'
 import { useState, useEffect } from 'react'
