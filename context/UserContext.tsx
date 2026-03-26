@@ -1,5 +1,3 @@
-'use client'
-
 import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
