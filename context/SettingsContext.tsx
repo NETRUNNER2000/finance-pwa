@@ -44,7 +44,6 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const { selectedAccount } = useUser()
 
   const [settings, setSettings] = useState<Settings>(defaultSettings)
-  const [hydrated, setHydrated] = useState(false)
 
   const getCacheKey = (userId: string) => `settings_${userId}`
 
@@ -167,12 +166,8 @@ console.log('payload.user_id:', payload.user_id)
   useEffect(() => {
     if (!selectedAccount || typeof window === 'undefined') return
 
-    loadSettings(selectedAccount).then(() => {
-      setHydrated(true)
-    })
+    loadSettings(selectedAccount)
   }, [selectedAccount])
-
-  if (!hydrated) return null
 
   return (
     <SettingsContext.Provider value={{ settings, updateSettings, refreshSettings }}>
