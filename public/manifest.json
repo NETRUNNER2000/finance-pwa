@@ -1,7 +1,7 @@
 {
-	"name": "Rice Bowl",
-	"short_name": "Rice Bowl",
-	"description": "Fluffless jasmine rice for those cold winter nights",
+	"name": "Stonks Personal Finance",
+	"short_name": "Stonks Personal Finance",
+	"description": "A personal finance dashboard and budgeting tool built with React and TypeScript.",
 	"icons": [
 		{
 			"src": "/images/icon-192.png",

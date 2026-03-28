@@ -1,8 +1,8 @@
 {
   "packageId": "app.netlify.personal_finance_netrunner.twa",
   "host": "personal-finance-netrunner.netlify.app",
-  "name": "Rice Bowl",
-  "launcherName": "Rice Bowl",
+  "name": "Stonks Personal Finance",
+  "launcherName": "Stonks Personal Finance",
   "display": "standalone",
   "themeColor": "#FFFFFF",
   "themeColorDark": "#000000",
