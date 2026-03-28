@@ -13,8 +13,8 @@
   "backgroundColor": "#FFFFFF",
   "enableNotifications": true,
   "startUrl": "/?source=pwa",
-  "iconUrl": "https://personal-finance-netrunner.netlify.app/images/icon-512.png",
-  "maskableIconUrl": "https://personal-finance-netrunner.netlify.app/images/icon-maskable-512.png",
+  "iconUrl": "https://personal-finance-netrunner.netlify.app/icons/manifest-icon-512.maskable.png",
+  "maskableIconUrl": "https://personal-finance-netrunner.netlify.app/icons/manifest-icon-512.maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "C:\\Users\\shaah\\Code\\personal-finance\\android.keystore",
