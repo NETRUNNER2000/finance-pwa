@@ -18,7 +18,7 @@ const Page = ({
     <>
       {title && (
         <Head>
-          <title>Rice Bowl | {title}</title>
+          <title>Stonks Personal Finance | {title}</title>
         </Head>
       )}
 
