@@ -7,6 +7,8 @@ type Settings = {
   language: string
   grossIncome: number
   payday: number
+  filterDataStartDate: string
+  filterDataEndDate: string
   interestRate: number
   investmentBalance: number
   linechartInterval: 'daily' | 'weekly' | 'monthly' | 'yearly'
@@ -26,6 +28,8 @@ const defaultSettings: Settings = {
   language: 'en',
   grossIncome: 0,
   payday: 25,
+  filterDataStartDate: new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
+  filterDataEndDate: new Date().toISOString().split('T')[0],
   interestRate: 0,
   investmentBalance: 0,
   linechartInterval: 'monthly',
@@ -58,6 +62,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     language: 'en',
     grossIncome: data.gross_income ?? 0,
     payday: data.payday ?? 25,
+    filterDataStartDate: data.filter_data_start_date ?? new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
+    filterDataEndDate: data.filter_data_end_date ?? new Date().toISOString().split('T')[0],
     interestRate: data.interest_rate ?? 0,
     investmentBalance: data.investment_balance ?? 0,
     linechartInterval: data.linechart_interval ?? 'monthly',
@@ -70,6 +76,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     user_id: userId,
     gross_income: settings.grossIncome,
     payday: settings.payday,
+    filter_data_start_date: settings.filterDataStartDate,
+    filter_data_end_date: settings.filterDataEndDate,
     interest_rate: settings.interestRate,
     investment_balance: settings.investmentBalance,
     linechart_interval: settings.linechartInterval,

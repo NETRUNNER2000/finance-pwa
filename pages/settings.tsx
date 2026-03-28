@@ -13,6 +13,8 @@ const Settings = () => {
     payday: 1,
     interestRate: 0,
     investmentBalance: 0,
+    filterDataStartDate: new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
+    filterDataEndDate: new Date().toISOString().split('T')[0],
     linechartInterval: 'monthly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
     monthlyTax: 0,
     monthlyUIF: 0,
@@ -28,6 +30,8 @@ const Settings = () => {
       payday: settings.payday || 1,
       interestRate: settings.interestRate || 0,
       investmentBalance: settings.investmentBalance || 0,
+      filterDataStartDate: settings.filterDataStartDate || new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
+      filterDataEndDate: settings.filterDataEndDate || new Date().toISOString().split('T')[0],
       linechartInterval: settings.linechartInterval || 'monthly',
       monthlyTax: settings.monthlyTax || 0,
       monthlyUIF: settings.monthlyUIF || 0,
@@ -148,6 +152,26 @@ const Settings = () => {
               <option value="monthly">Monthly</option>
               <option value="yearly">Yearly</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Data Filter Start Date</label>
+            <input
+              type="date"
+              value={localSettings.filterDataStartDate}
+              onChange={e => handleChange('filterDataStartDate', e.target.value)}
+              className="border p-2 rounded w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Data Filter End Date</label>
+            <input
+              type="date"
+              value={localSettings.filterDataEndDate}
+              onChange={e => handleChange('filterDataEndDate', e.target.value)}
+              className="border p-2 rounded w-full"
+            />
           </div>
 
           <div className="flex gap-2">
