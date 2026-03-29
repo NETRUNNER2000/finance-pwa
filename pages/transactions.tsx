@@ -21,6 +21,7 @@ const Transactions = () => {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
+  const [transactionDate, setTransactionDate] = useState(() => new Date().toISOString().split('T')[0])
   const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
 
   // --- Filters ---
@@ -77,14 +78,16 @@ useEffect(() => {
           amount: parsedAmount,
           category: sanitizedCategory,
           description: sanitizedDescription || null,
+          transaction_date: transactionDate,
           transaction_type: transactionType
-        },
+        }
       ])
       if (error) throw error
 
       setAmount('')
       setCategory('')
       setDescription('')
+      setTransactionDate('')
 
       const { data } = await supabase
         .from('transactions')
@@ -193,6 +196,13 @@ useEffect(() => {
             value={description}
             onChange={e => setDescription(e.target.value)}
             className="border p-2 rounded w-full text-gray-900"
+          />
+          <input
+            type="date"
+            value={transactionDate}
+            onChange={e => setTransactionDate(e.target.value)}
+            className="border p-2 rounded w-full text-gray-900"
+            required
           />
           <button
             type="submit"
