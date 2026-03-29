@@ -1,8 +1,10 @@
 import Page from '@/components/page'
+import DateRangePicker from '../components/DateRangePicker'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useUser } from '../context/UserContext'
+import { useSettings } from '../context/SettingsContext'
 
 interface Transaction {
   id: string
@@ -16,6 +18,7 @@ interface Transaction {
 const Transactions = () => {
   const router = useRouter()
   const { memoUser, selectedAccount } = useUser()
+  const { settings, updateSettings } = useSettings()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [amount, setAmount] = useState('')
@@ -24,13 +27,38 @@ const Transactions = () => {
   const [transactionDate, setTransactionDate] = useState(() => new Date().toISOString().split('T')[0])
   const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
 
+  const addMonths = (sourceDate: Date, months: number): Date => {
+    const date = new Date(sourceDate)
+    const day = date.getDate()
+    date.setMonth(date.getMonth() + months)
+
+    if (date.getDate() < day) {
+      date.setDate(0)
+    }
+
+    return date
+  }
+
+  const shiftFilterRange = async (months: number) => {
+    if (!settings || !updateSettings) return
+    const currentStart = new Date(settings.filterDataStartDate)
+    const currentEnd = new Date(settings.filterDataEndDate)
+
+    const newStart = addMonths(currentStart, months)
+    const newEnd = addMonths(currentEnd, months)
+
+    await updateSettings({
+      filterDataStartDate: newStart.toISOString().split('T')[0],
+      filterDataEndDate: newEnd.toISOString().split('T')[0]
+    })
+  }
+
   // --- Filters ---
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [minAmount, setMinAmount] = useState('')
   const [maxAmount, setMaxAmount] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-
   const [showFilters, setShowFilters] = useState(false)
 
   // At the top of Transactions component
@@ -45,18 +73,28 @@ useEffect(() => {
     const fetchTransactions = async () => {
       if (!selectedAccount) return
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('transactions')
         .select('*')
         .eq('user_id', selectedAccount)
-        .order('transaction_date', { ascending: false })
+
+      if (settings?.filterDataStartDate) {
+        query = query.gte('transaction_date', settings.filterDataStartDate)
+      }
+
+      if (settings?.filterDataEndDate) {
+        query = query.lte('transaction_date', settings.filterDataEndDate)
+      }
+
+      // Only fetch transactions that are in the selected range.
+      const { data, error } = await query
 
       if (error) console.error('Fetch transactions error:', error)
       else setTransactions(data || [])
     }
 
     fetchTransactions()
-  }, [selectedAccount])
+  }, [selectedAccount, settings?.filterDataStartDate, settings?.filterDataEndDate])
 
   // --- Add transaction ---
   const addTransaction = async (e: React.FormEvent, transactionType: string) => {
@@ -170,6 +208,16 @@ useEffect(() => {
 
   return (
     <Page title="Transactions">
+      {/* Date Range Controls (dashboard-styled) */}
+      <DateRangePicker
+        startDate={settings?.filterDataStartDate || ''}
+        endDate={settings?.filterDataEndDate || ''}
+        onPrev={() => shiftFilterRange(-1)}
+        onNext={() => shiftFilterRange(1)}
+        onStartDateChange={date => updateSettings?.({ filterDataStartDate: date })}
+        onEndDateChange={date => updateSettings?.({ filterDataEndDate: date })}
+      />
+
       {/* Add Transaction Form */}
       <div className="bg-white p-6 rounded shadow mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
@@ -220,6 +268,7 @@ useEffect(() => {
           </button>
         </form>
       </div>
+
 {/* Mobile toggle */}
 <div className="sm:hidden mb-2">
   <button

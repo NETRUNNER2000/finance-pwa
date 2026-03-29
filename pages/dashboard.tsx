@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient'
 import Page from '@/components/page'
 import SankeyChart from '../components/SankeyChart'
 import LineChart from '../components/LineChart'
+import DateRangePicker from '../components/DateRangePicker'
 
 interface CategoryTotal {
   category: string
@@ -104,32 +105,14 @@ const fetchCategoryTotals = useCallback(async (userId: string) => {
         <SankeyChart categoryTotals={categoryTotals} settings={settings} />
       </div>
 
-      <div className="mt-8 flex items-center justify-center gap-4">
-        <button
-          onClick={() => shiftFilterRange(-1)}
-          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-          aria-label="Previous timeframe"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <div className="flex flex-col items-center gap-1">
-          <p className="text-sm text-white font-small">{settings.filterDataStartDate} --- {settings.filterDataEndDate}</p>
-
-        </div>
-
-        <button
-          onClick={() => shiftFilterRange(1)}
-          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-          aria-label="Next timeframe"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+      <DateRangePicker
+        startDate={settings?.filterDataStartDate || ''}
+        endDate={settings?.filterDataEndDate || ''}
+        onPrev={() => shiftFilterRange(-1)}
+        onNext={() => shiftFilterRange(1)}
+        onStartDateChange={date => updateSettings?.({ filterDataStartDate: date })}
+        onEndDateChange={date => updateSettings?.({ filterDataEndDate: date })}
+      />
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-white mb-4">Transactions Last 12 Months</h2>
