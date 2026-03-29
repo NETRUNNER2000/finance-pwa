@@ -104,27 +104,31 @@ const fetchCategoryTotals = useCallback(async (userId: string) => {
         <SankeyChart categoryTotals={categoryTotals} settings={settings} />
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-2">
+      <div className="mt-8 flex items-center justify-center gap-4">
         <button
           onClick={() => shiftFilterRange(-1)}
-          className="px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
           aria-label="Previous timeframe"
         >
-          ←
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
+
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-sm text-white font-small">{settings.filterDataStartDate} --- {settings.filterDataEndDate}</p>
+
+        </div>
+
         <button
           onClick={() => shiftFilterRange(1)}
-          className="px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
           aria-label="Next timeframe"
         >
-          →
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
-      </div>
-
-      <div className="mt-4 p-4 rounded bg-white/10 text-white">
-        <p className="text-sm font-medium">Filter Range</p>
-        <p className="text-sm">Start: {settings.filterDataStartDate}</p>
-        <p className="text-sm">End: {settings.filterDataEndDate}</p>
       </div>
 
       <div className="mt-8">

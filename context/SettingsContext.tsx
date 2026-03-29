@@ -17,10 +17,17 @@ type Settings = {
   monthlyPension: number
 }
 
+type LocalSettings = {
+  visibleLineChartCategories: Set<string>
+  // Add more device-specific settings here as needed
+}
+
 type SettingsContextType = {
   settings: Settings
   updateSettings: (newSettings: Partial<Settings>) => Promise<void>
   refreshSettings: () => Promise<void>
+  localSettings: LocalSettings
+  updateLocalSettings: (newSettings: Partial<LocalSettings>) => void
 }
 
 const defaultSettings: Settings = {
@@ -38,18 +45,26 @@ const defaultSettings: Settings = {
   monthlyPension: 0
 }
 
+const defaultLocalSettings: LocalSettings = {
+  visibleLineChartCategories: new Set()
+}
+
 const SettingsContext = createContext<SettingsContextType>({
   settings: defaultSettings,
   updateSettings: async () => {},
-  refreshSettings: async () => {}
+  refreshSettings: async () => {},
+  localSettings: defaultLocalSettings,
+  updateLocalSettings: () => {}
 })
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const { selectedAccount } = useUser()
 
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(defaultLocalSettings)
 
   const getCacheKey = (userId: string) => `settings_${userId}`
+  const getLocalSettingsKey = () => `local_settings_device`
 
   // 🔑 Always get real auth user
   const getAuthUserId = async () => {
@@ -86,6 +101,44 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     monthly_pension: settings.monthlyPension
   })
 
+  // 📱 Load local settings from localStorage
+  const loadLocalSettings = () => {
+    const key = getLocalSettingsKey()
+    const stored = localStorage.getItem(key)
+    
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as { visibleLineChartCategories?: string[] }
+        setLocalSettings({
+          visibleLineChartCategories: new Set<string>(parsed.visibleLineChartCategories || [])
+        })
+      } catch (e) {
+        console.error('Error parsing local settings:', e)
+        setLocalSettings(defaultLocalSettings)
+      }
+    } else {
+      setLocalSettings(defaultLocalSettings)
+    }
+  }
+
+  // 💾 Save local settings to localStorage
+  const updateLocalSettings = (newSettings: Partial<LocalSettings>) => {
+    setLocalSettings(prev => {
+      const updated: LocalSettings = {
+        ...prev,
+        ...newSettings
+      }
+      
+      const key = getLocalSettingsKey()
+      const toStore = {
+        visibleLineChartCategories: Array.from(updated.visibleLineChartCategories)
+      }
+      localStorage.setItem(key, JSON.stringify(toStore))
+      
+      return updated
+    })
+  }
+
   // 🚀 Fetch
   const fetchFromDB = async (userId: string) => {
     const { data, error } = await supabase
@@ -120,6 +173,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     const fresh = await fetchFromDB(userId)
     setSettings(fresh)
     localStorage.setItem(cacheKey, JSON.stringify(fresh))
+
+    // Load local settings on account load
+    loadLocalSettings()
   }
 
   // 🔄 Refresh
@@ -177,8 +233,14 @@ console.log('payload.user_id:', payload.user_id)
     loadSettings(selectedAccount)
   }, [selectedAccount])
 
+  // 🔁 Load local settings on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    loadLocalSettings()
+  }, [])
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, refreshSettings }}>
+    <SettingsContext.Provider value={{ settings, updateSettings, refreshSettings, localSettings, updateLocalSettings }}>
       {children}
     </SettingsContext.Provider>
   )
