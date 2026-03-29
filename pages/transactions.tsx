@@ -3,6 +3,7 @@ import DateRangePicker from '../components/DateRangePicker'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { invalidateSupabaseCache } from '../lib/cacheInvalidation'
 import { useUser } from '../context/UserContext'
 import { useSettings } from '../context/SettingsContext'
 
@@ -122,6 +123,8 @@ useEffect(() => {
       ])
       if (error) throw error
 
+      await invalidateSupabaseCache()
+
       setAmount('')
       setCategory('')
       setDescription('')
@@ -153,6 +156,7 @@ useEffect(() => {
         .eq('user_id', selectedAccount)
 
       if (error) throw error
+      await invalidateSupabaseCache()
       setTransactions(transactions.filter(t => t.id !== id))
     } catch (err: any) {
       console.error('Delete transaction error:', err)
