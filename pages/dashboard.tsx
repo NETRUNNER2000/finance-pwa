@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { useUser } from '../context/UserContext'
 import { useSettings } from '../context/SettingsContext'
 import { supabase } from '../lib/supabaseClient'
@@ -13,10 +14,22 @@ interface CategoryTotal {
 }
 
 export default function Dashboard() {
+  const router = useRouter()
   const { selectedAccount } = useUser()
   const { settings, updateSettings } = useSettings()
   const [categoryTotals, setCategoryTotals] = useState<CategoryTotal[]>([])
   const [last12Months, setLast12Months] = useState<any[]>([])
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (!data.user) {
+        router.replace('/login')
+      }
+    }
+
+    checkAuth()
+  }, [router])
 
   // Fetch category totals
 const fetchCategoryTotals = useCallback(async (userId: string) => {
