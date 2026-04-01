@@ -43,6 +43,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     const cachedLast12Months = last12MonthsCache[monthsKey]
 
     if (cachedCategoryTotals && cachedLast12Months) {
+      console.log('[DashboardContext] category totals (cache):', cachedCategoryTotals)
+      console.log('[DashboardContext] last 12 months (cache):', cachedLast12Months)
       setCategoryTotals(cachedCategoryTotals)
       setLast12Months(cachedLast12Months)
       return
@@ -65,6 +67,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
           console.error(error)
         } else {
           nextCategoryTotals = data || []
+          console.log('[DashboardContext] category totals (fresh):', nextCategoryTotals)
           setCategoryTotalsCache(prev => ({
             ...prev,
             [categoryKey]: nextCategoryTotals || []
@@ -82,6 +85,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
           console.error(error)
         } else {
           nextLast12Months = data || []
+          console.log('[DashboardContext] last 12 months (fresh):', nextLast12Months)
           setLast12MonthsCache(prev => ({
             ...prev,
             [monthsKey]: nextLast12Months || []
@@ -121,6 +125,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
         console.error(categoryResponse.error)
       } else {
         const nextCategoryTotals = categoryResponse.data || []
+        console.log('[DashboardContext] category totals (refresh):', nextCategoryTotals)
         setCategoryTotals(nextCategoryTotals)
         setCategoryTotalsCache(prev => ({
           ...prev,
@@ -132,6 +137,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
         console.error(monthsResponse.error)
       } else {
         const nextLast12Months = monthsResponse.data || []
+        console.log('[DashboardContext] last 12 months (refresh):', nextLast12Months)
         setLast12Months(nextLast12Months)
         setLast12MonthsCache(prev => ({
           ...prev,

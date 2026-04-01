@@ -113,17 +113,29 @@ useEffect(() => {
       return alert('Amount must be a valid number greater than 0')
 
     try {
+      const transactionPayload = {
+        user_id: selectedAccount,
+        amount: parsedAmount,
+        category: sanitizedCategory,
+        description: sanitizedDescription || null,
+        transaction_date: transactionDate,
+        transaction_type: transactionType
+      }
+
+      console.log('[Transactions] add payload:', transactionPayload)
+
       const { error } = await supabase.from('transactions').insert([
-        {
-          user_id: selectedAccount,
-          amount: parsedAmount,
-          category: sanitizedCategory,
-          description: sanitizedDescription || null,
-          transaction_date: transactionDate,
-          transaction_type: transactionType
-        }
+        transactionPayload
       ])
       if (error) throw error
+
+      console.log('[Transactions] add success:', {
+        user_id: selectedAccount,
+        transaction_type: transactionType,
+        category: sanitizedCategory,
+        amount: parsedAmount,
+        transaction_date: transactionDate
+      })
 
       await invalidateSupabaseCache()
       if (settings?.filterDataStartDate && settings?.filterDataEndDate) {
@@ -148,6 +160,13 @@ useEffect(() => {
       setTransactions(data || [])
     } catch (err: any) {
       console.error('Add transaction error:', err)
+      console.error('[Transactions] add failed payload:', {
+        user_id: selectedAccount,
+        transaction_type: transactionType,
+        category: sanitizedCategory,
+        amount: parsedAmount,
+        transaction_date: transactionDate
+      })
       alert(`Failed to add transaction: ${err.message}`)
     }
   }
@@ -377,6 +396,7 @@ useEffect(() => {
               >
                 <div className="text-gray-900">
                   {`${t.transaction_type} `}<strong>{t.category}</strong>: ${t.amount.toFixed(2)}
+                  {` on ${new Date(t.transaction_date).toLocaleDateString()}`}
                   {t.description && ` — ${t.description}`}
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">

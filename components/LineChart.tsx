@@ -79,9 +79,7 @@ export default function LineChart({ last12Months }: LineChartProps) {
       return d
     })
 
-    const monthNames = monthDates.map(d =>
-      d.toLocaleString('default', { month: 'short', year: '2-digit' })
-    )
+    const monthNames = monthDates.map(d => d3.timeFormat('%b')(d))
 
     // Extract unique categories
     const categories = Array.from(new Set(last12Months.map(d => d.category)))
