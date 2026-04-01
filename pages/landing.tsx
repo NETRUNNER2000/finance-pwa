@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-        <title>Budget Atlas | Understand Every Rand</title>
+       
         <meta
           name="description"
           content="Track income and expenses, see category flows, and understand 12-month trends in one personal finance workspace."
