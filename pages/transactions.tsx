@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient'
 import { invalidateSupabaseCache } from '../lib/cacheInvalidation'
 import { useUser } from '../context/UserContext'
 import { useSettings } from '../context/SettingsContext'
+import { useDashboard } from '../context/DashboardContext'
 
 interface Transaction {
   id: string
@@ -20,6 +21,7 @@ const Transactions = () => {
   const router = useRouter()
   const { memoUser, selectedAccount } = useUser()
   const { settings, updateSettings } = useSettings()
+  const { refreshDashboardData } = useDashboard()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [amount, setAmount] = useState('')
@@ -124,6 +126,13 @@ useEffect(() => {
       if (error) throw error
 
       await invalidateSupabaseCache()
+      if (settings?.filterDataStartDate && settings?.filterDataEndDate) {
+        await refreshDashboardData(
+          selectedAccount,
+          settings.filterDataStartDate,
+          settings.filterDataEndDate
+        )
+      }
 
       setAmount('')
       setCategory('')
@@ -157,6 +166,13 @@ useEffect(() => {
 
       if (error) throw error
       await invalidateSupabaseCache()
+      if (settings?.filterDataStartDate && settings?.filterDataEndDate) {
+        await refreshDashboardData(
+          selectedAccount,
+          settings.filterDataStartDate,
+          settings.filterDataEndDate
+        )
+      }
       setTransactions(transactions.filter(t => t.id !== id))
     } catch (err: any) {
       console.error('Delete transaction error:', err)
