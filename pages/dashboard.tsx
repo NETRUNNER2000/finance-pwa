@@ -19,7 +19,7 @@ export default function Dashboard() {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getUser()
       if (!data.user) {
-        router.replace('/login')
+        router.replace('/landing')
       }
     }
 

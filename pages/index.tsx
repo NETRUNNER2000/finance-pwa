@@ -1,16 +1,24 @@
-// pages/index.js
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Home() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    router.replace('/dashboard'); // redirect to your dashboard
-  }, [router]);
+    const routeUser = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        router.replace('/dashboard')
+      } else {
+        router.replace('/landing')
+      }
+    }
+
+    routeUser()
+  }, [router])
 
 
-  return null; // or a loading spinner
+  return null
 }
