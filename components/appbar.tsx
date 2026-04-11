@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
 import { useState, useEffect } from 'react'
 import { useUser } from '../context/UserContext'
+import { Button } from './ui/button'
 
 const links = [
   {label: 'Dashboard', href:"/dashboard"},
@@ -22,8 +23,8 @@ const Appbar = () => {
   }, [memoUser, setUser])
   
   return (
-    <div className='fixed top-0 left-0 z-20 w-full bg-zinc-900 pt-safe'>
-      <header className='border-b bg-zinc-100 px-safe dark:border-zinc-800 dark:bg-zinc-900'>
+    <div className='fixed top-0 left-0 z-20 w-full bg-background pt-safe'>
+      <header className='border-b bg-background px-safe'>
         <div className='mx-auto flex h-20 max-w-screen-md items-center justify-between px-6'>
 
           <Link href='/'>
@@ -32,18 +33,18 @@ const Appbar = () => {
 
           <nav className='flex items-center space-x-6'>
             <div className='hidden sm:block'>
-              <div className='flex items-center space-x-6'>
+              <div className='flex items-center space-x-1'>
                 {links.map(({ label, href }) => (
                   <Link
                     key={label}
                     href={href}
-                    className={`text-sm ${
-                      router.pathname === href
-                        ? 'text-indigo-500 dark:text-indigo-400'
-                        : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50'
-                    }`}
                   >
-                    {label}
+                    <Button
+                      variant={router.pathname === href ? "default" : "ghost"}
+                      className='text-sm'
+                    >
+                      {label}
+                    </Button>
                   </Link>
                 ))}
               </div>
@@ -51,36 +52,41 @@ const Appbar = () => {
 
             {/* Selected account dropdown */}
             <div className="relative">
-              <div
+              <Button
                 onClick={() => setOpen(!open)}
-                className='cursor-pointer h-10 w-28 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-medium text-sm'
+                variant="outline"
+                className="w-28 justify-center"
               >
                 {sharedAccounts.find(a => a.id === selectedAccount)?.displayName || 'Select Account'}
-              </div>
+              </Button>
 
               {open && (
-                <div className="absolute right-0 mt-3 w-56 rounded-xl bg-white shadow-lg dark:bg-zinc-800 p-2 space-y-2">
+                <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg p-2 space-y-1">
 
                   <Link href="/user">
-                    <div className="text-sm px-2 py-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded cursor-pointer">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-sm"
+                    >
                       My Account
-                    </div>
+                    </Button>
                   </Link>
 
-                  <div className="border-t border-zinc-200 dark:border-zinc-700 my-1"/>
+                  <div className="border-t border-border my-1"/>
 
                   {/* Shared accounts */}
                   {sharedAccounts.length === 0 ? (
-                    <div className="text-xs px-2 text-zinc-400">None</div>
+                    <div className="text-xs px-2 text-muted-foreground">None</div>
                   ) : (
                     sharedAccounts.map((item) => (
-                      <div
+                      <Button
                         key={item.id}
-                        className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-700 rounded cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-700"
+                        variant="ghost"
                         onClick={() => { setSelectedAccount(item.id); setOpen(false) }}
+                        className="w-full justify-start text-xs"
                       >
                         {item.displayName}
-                      </div>
+                      </Button>
                     ))
                   )}
 
