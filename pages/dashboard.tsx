@@ -8,6 +8,7 @@ import Page from '@/components/page'
 import SankeyChart from '../components/SankeyChart'
 import LineChart from '../components/LineChart'
 import DateRangePicker from '../components/DateRangePicker'
+import InvestmentProjectionChart from '../components/InvestmentProjectionChart'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -67,6 +68,7 @@ export default function Dashboard() {
   return (
     <Page title="Dashboard">
       <div className="transparent-bg sankey-container">
+        <h2 className="text-xl font-semibold text-white mb-4">Income Expense Visual</h2>
         <SankeyChart categoryTotals={categoryTotals} settings={settings} />
       </div>
 
@@ -82,6 +84,16 @@ export default function Dashboard() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-white mb-4">Transactions Last 12 Months</h2>
         <LineChart last12Months={last12Months} />
+      </div>
+
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold text-white mb-4">Investment Growth Projection</h2>
+        <InvestmentProjectionChart
+          initialAmount={10000}
+          monthlyContribution={500}
+          monthlyRate={0.005}
+          months={6}
+        />
       </div>
     </Page>
   )
