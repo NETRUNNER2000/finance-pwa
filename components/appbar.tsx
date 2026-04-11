@@ -23,8 +23,59 @@ const Appbar = () => {
   }, [memoUser, setUser])
   
   return (
-    <div className='fixed top-0 left-0 z-20 w-full pt-safe' style={{ backgroundColor: 'var(--appbar-bg)' }}>
-      <header className='border-b px-safe' style={{ backgroundColor: 'var(--appbar-bg)' }}>
+    <div
+      className='fixed top-0 left-0 z-20 w-full pt-safe overflow-hidden'
+      style={{
+        backgroundColor: 'rgba(20, 20, 20, 0.4)',
+        backdropFilter: 'blur(8px) brightness(1.05)',
+        WebkitBackdropFilter: 'blur(8px) brightness(1.05)',
+        background: `
+          radial-gradient(ellipse 150% 150% at 50% -30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+          rgba(20, 20, 20, 0.4)
+        `,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '95%',
+          height: '3px',
+          background: `
+            linear-gradient(90deg,
+              transparent 0%,
+              rgba(255, 255, 255, 0.15) 25%,
+              rgba(255, 255, 255, 0.35) 50%,
+              rgba(255, 255, 255, 0.15) 75%,
+              transparent 100%
+            )
+          `,
+          borderRadius: '50%',
+          filter: 'blur(0.5px)',
+        }}
+      />
+      <header
+        className='border-b px-safe relative'
+        style={{
+          backgroundColor: 'rgba(15, 15, 15, 0.25)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          boxShadow: `
+            0 4px 16px -8px rgba(0, 0, 0, 0.7),
+            inset 0 1px 3px rgba(255, 255, 255, 0.2),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.5)
+          `,
+          borderBottomLeftRadius: '20px',
+          borderBottomRightRadius: '20px',
+          background: `
+            radial-gradient(ellipse 180% 120% at 50% -10%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 35%, transparent 70%),
+            rgba(15, 15, 15, 0.25)
+          `,
+        }}
+      >
         <div className='mx-auto flex h-20 max-w-screen-md items-center justify-between px-6'>
 
           <Link href='/'>
