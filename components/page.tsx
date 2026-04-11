@@ -25,7 +25,7 @@ const Page = ({
       <Appbar/>
 
       <main
-        className="mx-auto max-w-screen-md pt-20 pb-16 px-safe sm:pb-0"
+        className="mx-auto max-w-screen-md pt-14 pb-16 px-safe sm:pb-0"
       >
         <div className="p-6">{children}</div>
       </main>

@@ -82,7 +82,7 @@ const Appbar = () => {
             `,
           }}
         >
-          <div className='mx-auto flex h-20 max-w-screen-md items-center justify-between px-6'>
+          <div className='mx-auto flex h-14 max-w-screen-md items-center justify-between px-6'>
 
             <Link href='/'>
               <h1 className='font-medium'>Welcome {memoUser?.displayName || 'loading...'}</h1>
