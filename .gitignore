@@ -14,3 +14,6 @@ node_modules
 /build/*
 /gradle/*
 .gradle/*
+
+.env
+.env.local

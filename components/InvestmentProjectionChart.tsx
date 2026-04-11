@@ -14,7 +14,7 @@ export default function InvestmentProjectionChart({
   monthlyRate = 0.005, // 0.5% monthly (6% annual)
   months = 6
 }: InvestmentProjectionChartProps) {
-  const chartRef = useRef<SVGSVXElement | null>(null)
+  const chartRef = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {
     if (!chartRef.current) return
