@@ -74,6 +74,7 @@ const Transactions = () => {
   const [showFilters, setShowFilters] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null)
+  const [showAddTransactionForm, setShowAddTransactionForm] = useState(false)
 
   // At the top of Transactions component
 useEffect(() => {
@@ -247,55 +248,88 @@ useEffect(() => {
 
       {/* Add Transaction Form */}
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Add Transaction</CardTitle>
+        <CardHeader
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => setShowAddTransactionForm(!showAddTransactionForm)}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle>Add Transaction</CardTitle>
+            <button
+              className="rounded-full p-1 hover:bg-accent transition-colors"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowAddTransactionForm(!showAddTransactionForm)
+              }}
+            >
+              <svg
+                className={`w-6 h-6 transition-transform text-green-400 ${showAddTransactionForm ? 'rotate-45' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                style={{
+                  filter: 'drop-shadow(0 0 8px rgba(74, 222, 128, 0.8))',
+                  strokeWidth: 2.5
+                }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-            <Input
-              type="number"
-              placeholder="Amount"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              required
-            />
-            <Input
-              type="text"
-              placeholder="Category"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              required
-            />
-            <Input
-              type="text"
-              placeholder="Description (optional)"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-            />
-            <Input
-              type="date"
-              value={transactionDate}
-              onChange={e => setTransactionDate(e.target.value)}
-              required
-            />
-            <Button
-              type="submit"
-              onClick={(e) => addTransaction(e, 'expense')}
-              variant="outline"
-              className="col-span-full sm:col-auto"
-            >
-              Add Expense
-            </Button>
-            <Button
-              type="submit"
-              onClick={(e) => addTransaction(e, 'income')}
-              variant="outline"
-              className="col-span-full sm:col-auto"
-            >
-              Add Income
-            </Button>
-          </form>
-        </CardContent>
+        {showAddTransactionForm && (
+          <CardContent>
+            <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+              <Input
+                type="number"
+                placeholder="Amount"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                required
+              />
+              <Input
+                type="text"
+                placeholder="Category"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                required
+              />
+              <Input
+                type="text"
+                placeholder="Description (optional)"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+              />
+              <Input
+                type="date"
+                value={transactionDate}
+                onChange={e => setTransactionDate(e.target.value)}
+                required
+              />
+              <Button
+                type="submit"
+                onClick={(e) => addTransaction(e, 'expense')}
+                variant="outline"
+                className="col-span-full sm:col-auto text-red-500 border-red-500 hover:border-red-400 hover:text-red-400"
+                style={{
+                  textShadow: '0 0 10px rgba(239, 68, 68, 0.6)'
+                }}
+              >
+                Add Expense
+              </Button>
+              <Button
+                type="submit"
+                onClick={(e) => addTransaction(e, 'income')}
+                variant="outline"
+                className="col-span-full sm:col-auto text-green-500 border-green-500 hover:border-green-400 hover:text-green-400"
+                style={{
+                  textShadow: '0 0 10px rgba(74, 222, 128, 0.6)'
+                }}
+              >
+                Add Income
+              </Button>
+            </form>
+          </CardContent>
+        )}
       </Card>
 
 {/* Mobile toggle */}
