@@ -64,9 +64,13 @@ const BottomNav = () => {
 							href={href}
 						>
 							<Button
-								variant={router.pathname === href ? "default" : "ghost"}
+								variant="ghost"
 								className='h-auto p-2'
 								title={label}
+								style={router.pathname === href ? {
+									color: '#3b82f6',
+									filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
+								} : {}}
 							>
 								{icon}
 							</Button>
