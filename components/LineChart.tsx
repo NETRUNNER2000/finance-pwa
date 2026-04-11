@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import { useSettings } from '../context/SettingsContext'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 
 interface LastMonthData {
   category: string
@@ -161,42 +163,45 @@ export default function LineChart({ last12Months }: LineChartProps) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Select Categories to Display</h2>
-            
-            <div className="space-y-3 mb-6">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={visibleCategories.size === allCategories.length}
-                  onChange={(e) => toggleAll(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span className="font-medium text-gray-700">Select All</span>
-              </label>
-              
-              <div className="border-t pt-3 space-y-2">
-                {allCategories.sort().map((category) => (
-                  <label key={category} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={visibleCategories.has(category)}
-                      onChange={() => toggleCategory(category)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-gray-700">{category}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+          <Card className="max-w-md w-full mx-4">
+            <CardHeader>
+              <CardTitle>Select Categories to Display</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 mb-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={visibleCategories.size === allCategories.length}
+                    onChange={(e) => toggleAll(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="font-medium">Select All</span>
+                </label>
 
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
-            >
-              Done
-            </button>
-          </div>
+                <div className="border-t pt-3 space-y-2">
+                  {allCategories.sort().map((category) => (
+                    <label key={category} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={visibleCategories.has(category)}
+                        onChange={() => toggleCategory(category)}
+                        className="w-4 h-4"
+                      />
+                      <span>{category}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setShowModal(false)}
+                className="w-full"
+              >
+                Done
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>

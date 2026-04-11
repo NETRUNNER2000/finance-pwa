@@ -20,7 +20,7 @@ export default function DateRangePicker({
   const [activePopup, setActivePopup] = useState<'start' | 'end' | null>(null)
 
   return (
-    <div className="mt-8 flex flex-col items-center justify-center gap-2">
+    <div className="flex flex-col items-center justify-center gap-2 mb-6">
       <div className="flex items-center justify-center gap-4">
         <button
           onClick={onPrev}

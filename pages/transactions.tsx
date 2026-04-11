@@ -10,6 +10,13 @@ import { useDashboard } from '../context/DashboardContext'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
 
 interface Transaction {
   id: string
@@ -31,7 +38,6 @@ const Transactions = () => {
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
   const [transactionDate, setTransactionDate] = useState(() => new Date().toISOString().split('T')[0])
-  const [shareEmails, setShareEmails] = useState<{ [key: string]: string }>({})
 
   const addMonths = (sourceDate: Date, months: number): Date => {
     const date = new Date(sourceDate)
@@ -66,6 +72,8 @@ const Transactions = () => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null)
 
   // At the top of Transactions component
 useEffect(() => {
@@ -175,15 +183,19 @@ useEffect(() => {
   }
 
   // --- Delete transaction ---
-  const deleteTransaction = async (id: string) => {
-    if (!memoUser || !selectedAccount) return
-    if (!confirm('Are you sure you want to delete this transaction?')) return
+  const confirmDeleteTransaction = (id: string) => {
+    setTransactionToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const deleteTransaction = async () => {
+    if (!memoUser || !selectedAccount || !transactionToDelete) return
 
     try {
       const { error } = await supabase
         .from('transactions')
         .delete()
-        .eq('id', id)
+        .eq('id', transactionToDelete)
         .eq('user_id', selectedAccount)
 
       if (error) throw error
@@ -195,39 +207,12 @@ useEffect(() => {
           settings.filterDataEndDate
         )
       }
-      setTransactions(transactions.filter(t => t.id !== id))
+      setTransactions(transactions.filter(t => t.id !== transactionToDelete))
+      setDeleteConfirmOpen(false)
+      setTransactionToDelete(null)
     } catch (err: any) {
       console.error('Delete transaction error:', err)
       alert(`Delete failed: ${err.message}`)
-    }
-  }
-
-  // --- Share transaction ---
-  const shareTransaction = async (transactionId: string) => {
-    const email = shareEmails[transactionId]?.trim()
-    if (!email) return alert("Enter a user's email")
-    if (!memoUser) return
-
-    try {
-      const { data: partnerUser, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email)
-        .single()
-
-      if (userError || !partnerUser) return alert('User not found')
-
-      const { error: insertError } = await supabase
-        .from('transaction_access')
-        .insert([{ transaction_id: transactionId, user_id: partnerUser.id }])
-
-      if (insertError) throw insertError
-
-      alert('Transaction shared!')
-      setShareEmails({ ...shareEmails, [transactionId]: '' })
-    } catch (err: any) {
-      console.error('Share transaction error:', err)
-      alert(`Something went wrong: ${err.message}`)
     }
   }
 
@@ -246,7 +231,7 @@ useEffect(() => {
     if (endDate && dateVal > new Date(endDate)) return false
 
     return true
-  })
+  }).sort((a, b) => new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime())
 
   return (
     <Page title="Transactions">
@@ -330,16 +315,17 @@ useEffect(() => {
   <CardContent>
     <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
       {/* Category */}
-      <select
-        value={selectedCategory}
-        onChange={e => setSelectedCategory(e.target.value)}
-        className="border p-2 rounded"
-      >
-        <option value="all">All Categories</option>
-        {categories.map(cat => (
-          <option key={cat} value={cat}>{cat}</option>
-        ))}
-      </select>
+      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Categories</SelectItem>
+          {categories.map(cat => (
+            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {/* Min Amount */}
       <Input
         type="number"
@@ -390,50 +376,78 @@ useEffect(() => {
         </CardHeader>
         <CardContent>
           {filteredTransactions.length === 0 ? (
-            <p className="text-muted-foreground">No transactions found</p>
+            <p className="text-muted-foreground text-center py-8">No transactions found</p>
           ) : (
-            <ul className="space-y-4">
+            <div className="space-y-2">
               {filteredTransactions.map(t => (
-                <li
+                <div
                   key={t.id}
-                  className="border p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+                  className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors flex items-center justify-between"
                 >
-                  <div className="flex-1">
-                    {`${t.transaction_type} `}<strong>{t.category}</strong>: ${t.amount.toFixed(2)}
-                    {` on ${new Date(t.transaction_date).toLocaleDateString()}`}
-                    {t.description && ` — ${t.description}`}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-base">{t.category}</div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      {new Date(t.transaction_date).toLocaleDateString()}
+                    </div>
+                    {t.description && (
+                      <div className="mt-1 text-sm text-foreground/70 truncate">
+                        {t.description}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                    <Input
-                      type="email"
-                      placeholder="Partner email"
-                      value={shareEmails[t.id] || ''}
-                      onChange={e =>
-                        setShareEmails({ ...shareEmails, [t.id]: e.target.value })
-                      }
-                      className="flex-1 sm:w-48"
-                    />
+                  <div className="flex items-center gap-4 ml-4">
+                    <span className={`font-semibold text-lg ${t.transaction_type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {t.transaction_type === 'income' ? '+' : '-'}R{t.amount.toFixed(2)}
+                    </span>
                     <Button
-                      onClick={() => shareTransaction(t.id)}
-                      variant="outline"
+                      onClick={() => confirmDeleteTransaction(t.id)}
+                      variant="ghost"
                       size="sm"
+                      className="h-8 w-8 p-0 hover:bg-destructive/20 hover:text-destructive"
                     >
-                      Share
-                    </Button>
-                    <Button
-                      onClick={() => deleteTransaction(t.id)}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      Delete
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                     </Button>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </CardContent>
       </Card>
+
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-96">
+            <CardHeader>
+              <CardTitle>Delete Transaction</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-6">
+                Are you sure you want to delete this transaction? This action cannot be undone.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteConfirmOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    deleteTransaction()
+                    setDeleteConfirmOpen(false)
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </Page>
   )
 }
