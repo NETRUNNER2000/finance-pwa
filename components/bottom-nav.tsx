@@ -65,12 +65,15 @@ const BottomNav = () => {
 						>
 							<Button
 								variant="ghost"
-								className='h-auto p-2'
+								className='h-auto p-2 transition-all duration-300 ease-out'
 								title={label}
 								style={router.pathname === href ? {
 									color: '#3b82f6',
-									filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
-								} : {}}
+									filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))',
+									transform: 'scale(1.1)',
+								} : {
+									transform: 'scale(1)',
+								}}
 							>
 								{icon}
 							</Button>

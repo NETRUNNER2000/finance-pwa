@@ -120,6 +120,10 @@ const Appbar = () => {
                 {open && (
                   <div
                     className="absolute top-full left-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg p-2 space-y-1 z-50"
+                    style={{
+                      animation: 'slideDown 0.2s ease-out',
+                      transformOrigin: 'top'
+                    }}
                   >
                     <Link href="/user">
                       <Button

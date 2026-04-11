@@ -277,7 +277,10 @@ useEffect(() => {
           </div>
         </CardHeader>
         {showAddTransactionForm && (
-          <CardContent>
+          <CardContent style={{
+            animation: 'slideDown 0.2s ease-out',
+            transformOrigin: 'top'
+          }}>
             <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
               <Input
                 type="number"
