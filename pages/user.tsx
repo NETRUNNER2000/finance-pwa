@@ -1,8 +1,10 @@
 import Page from '@/components/page'
-import Section from '@/components/section'
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useUser } from '../context/UserContext'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 
 const User = () => {
@@ -73,62 +75,65 @@ const grantAccess = async () => {
 }
   return (
     <Page title='User'>
-
-      <Section>
-        <h2 className='text-xl font-semibold mb-2'>Account Actions</h2>
-        <div className='flex flex-col sm:flex-row gap-3'>
-          {/* Logout button */}
-          <button
-            onClick={logout}
-            className='bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition'
-          >
-            Logout
-          </button>
-
-          {/* Reset Password */}
-          <div className='flex flex-col sm:flex-row gap-2'>
-            <input
-              type='email'
-              placeholder='Your email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value.trim())} // sanitize input
-              className='border p-2 rounded text-gray-900'
-            />
-            <button
-              onClick={resetPassword}
-              disabled={loading}
-              className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition'
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='flex flex-col sm:flex-row gap-3'>
+            {/* Logout button */}
+            <Button
+              onClick={logout}
+              variant="destructive"
             >
-              {loading ? 'Sending...' : 'Reset Password'}
-            </button>
+              Logout
+            </Button>
+
+            {/* Reset Password */}
+            <div className='flex flex-col sm:flex-row gap-2'>
+              <Input
+                type='email'
+                placeholder='Your email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim())}
+              />
+              <Button
+                onClick={resetPassword}
+                disabled={loading}
+              >
+                {loading ? 'Sending...' : 'Reset Password'}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Section>
+        </CardContent>
+      </Card>
 
       {/* Grant Transaction Access */}
-      <Section>
-        <h2 className='text-xl font-semibold mb-2'>Share Transactions</h2>
-        <p className='text-zinc-600 dark:text-zinc-400 mb-2'>
-          Enter another users email to grant them access to all your transactions.
-        </p>
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Share Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className='text-muted-foreground mb-4'>
+            Enter another users email to grant them access to all your transactions.
+          </p>
 
-        <div className='flex flex-col sm:flex-row gap-2'>
-          <input
-            type='email'
-            placeholder="User's email"
-            value={grantEmail}
-            onChange={(e) => setGrantEmail(e.target.value.trim())} // sanitize input
-            className='border p-2 rounded text-gray-900'
-          />
-          <button
-            onClick={grantAccess}
-            disabled={grantLoading}
-            className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition'
-          >
-            {grantLoading ? 'Sharing...' : 'Grant Access'}
-          </button>
-        </div>
-      </Section>
+          <div className='flex flex-col sm:flex-row gap-2'>
+            <Input
+              type='email'
+              placeholder="User's email"
+              value={grantEmail}
+              onChange={(e) => setGrantEmail(e.target.value.trim())}
+            />
+            <Button
+              onClick={grantAccess}
+              disabled={grantLoading}
+            >
+              {grantLoading ? 'Sharing...' : 'Grant Access'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </Page>
   )
 }

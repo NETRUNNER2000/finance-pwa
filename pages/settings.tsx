@@ -1,8 +1,17 @@
 import Page from '@/components/page'
-import Section from '@/components/section'
 import { useState, useEffect } from 'react'
 import { useSettings } from '../context/SettingsContext'
 import { useUser } from '../context/UserContext'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
 
 const Settings = () => {
   const { settings, updateSettings, refreshSettings } = useSettings()
@@ -55,143 +64,137 @@ const Settings = () => {
 
   return (
     <Page title="Settings">
-      <Section>
-        <h2 className="text-xl font-semibold mb-4">Settings</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Settings</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-4">
 
-        <div className="space-y-4">
+              <div>
+                <label className="block font-medium mb-1">Gross Income</label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={localSettings.grossIncome}
+                  onChange={e => handleChange('grossIncome', parseInt(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Gross Income</label>
-            <input
-              type="number"
-              min={0}
-              value={localSettings.grossIncome}
-              onChange={e => handleChange('grossIncome', parseInt(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Monthly Tax</label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={localSettings.monthlyTax}
+                  onChange={e => handleChange('monthlyTax', parseInt(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Monthly Tax</label>
-            <input
-              type="number"
-              min={0}
-              value={localSettings.monthlyTax}
-              onChange={e => handleChange('monthlyTax', parseInt(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Monthly UIF</label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={localSettings.monthlyUIF}
+                  onChange={e => handleChange('monthlyUIF', parseInt(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Monthly UIF</label>
-            <input
-              type="number"
-              min={0}
-              value={localSettings.monthlyUIF}
-              onChange={e => handleChange('monthlyUIF', parseInt(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Monthly Pension</label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={localSettings.monthlyPension}
+                  onChange={e => handleChange('monthlyPension', parseInt(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Monthly Pension</label>
-            <input
-              type="number"
-              min={0}
-              value={localSettings.monthlyPension}
-              onChange={e => handleChange('monthlyPension', parseInt(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Payday (1–31)</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={localSettings.payday}
+                  onChange={e => handleChange('payday', parseInt(e.target.value) || 1)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Payday (1–31)</label>
-            <input
-              type="number"
-              min={1}
-              max={31}
-              value={localSettings.payday}
-              onChange={e => handleChange('payday', parseInt(e.target.value) || 1)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Interest Rate (%)</label>
+                <Input
+                  type="number"
+                  step={0.01}
+                  value={localSettings.interestRate}
+                  onChange={e => handleChange('interestRate', parseFloat(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Interest Rate (%)</label>
-            <input
-              type="number"
-              step={0.01}
-              value={localSettings.interestRate}
-              onChange={e => handleChange('interestRate', parseFloat(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">
+                  Investment Account Balance (Start of Month)
+                </label>
+                <Input
+                  type="number"
+                  step={0.01}
+                  value={localSettings.investmentBalance}
+                  onChange={e => handleChange('investmentBalance', parseFloat(e.target.value) || 0)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">
-              Investment Account Balance (Start of Month)
-            </label>
-            <input
-              type="number"
-              step={0.01}
-              value={localSettings.investmentBalance}
-              onChange={e => handleChange('investmentBalance', parseFloat(e.target.value) || 0)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Line Chart Interval</label>
+                <Select value={localSettings.linechartInterval} onValueChange={(value) => handleChange('linechartInterval', value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Line Chart Interval</label>
-            <select
-              value={localSettings.linechartInterval}
-              onChange={e => handleChange('linechartInterval', e.target.value)}
-              className="border p-2 rounded w-full"
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Data Filter Start Date</label>
+                <Input
+                  type="date"
+                  value={localSettings.filterDataStartDate}
+                  onChange={e => handleChange('filterDataStartDate', e.target.value)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Data Filter Start Date</label>
-            <input
-              type="date"
-              value={localSettings.filterDataStartDate}
-              onChange={e => handleChange('filterDataStartDate', e.target.value)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div>
+                <label className="block font-medium mb-1">Data Filter End Date</label>
+                <Input
+                  type="date"
+                  value={localSettings.filterDataEndDate}
+                  onChange={e => handleChange('filterDataEndDate', e.target.value)}
+                />
+              </div>
 
-          <div>
-            <label className="block font-medium mb-1">Data Filter End Date</label>
-            <input
-              type="date"
-              value={localSettings.filterDataEndDate}
-              onChange={e => handleChange('filterDataEndDate', e.target.value)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={handleSave}
+                >
+                  Save Settings
+                </Button>
 
-          <div className="flex gap-2">
-            <button
-              onClick={handleSave}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Save Settings
-            </button>
+                <Button
+                  onClick={handleRefresh}
+                  variant="outline"
+                >
+                  Refresh
+                </Button>
+              </div>
 
-            <button
-              onClick={handleRefresh}
-              className="mt-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-            >
-              Refresh
-            </button>
-          </div>
-
-        </div>
-      </Section>
+            </div>
+          </CardContent>
+        </Card>
     </Page>
   )
 }

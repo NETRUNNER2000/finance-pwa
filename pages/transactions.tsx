@@ -7,6 +7,9 @@ import { invalidateSupabaseCache } from '../lib/cacheInvalidation'
 import { useUser } from '../context/UserContext'
 import { useSettings } from '../context/SettingsContext'
 import { useDashboard } from '../context/DashboardContext'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 interface Transaction {
   id: string
@@ -258,175 +261,179 @@ useEffect(() => {
       />
 
       {/* Add Transaction Form */}
-      <div className="bg-white p-6 rounded shadow mb-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
-        <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Category"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900"
-          />
-          <input
-            type="date"
-            value={transactionDate}
-            onChange={e => setTransactionDate(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900"
-            required
-          />
-          <button
-            type="submit"
-            onClick={(e) => addTransaction(e, 'expense')}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition col-span-full sm:col-auto"
-          >
-            Add Expense
-          </button>
-          <button
-            type="submit"
-            onClick={(e) => addTransaction(e, 'income')}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition col-span-full sm:col-auto"
-          >
-            Add Income
-          </button>
-        </form>
-      </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Add Transaction</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <Input
+              type="number"
+              placeholder="Amount"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              required
+            />
+            <Input
+              type="text"
+              placeholder="Category"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              required
+            />
+            <Input
+              type="text"
+              placeholder="Description (optional)"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+            />
+            <Input
+              type="date"
+              value={transactionDate}
+              onChange={e => setTransactionDate(e.target.value)}
+              required
+            />
+            <Button
+              type="submit"
+              onClick={(e) => addTransaction(e, 'expense')}
+              variant="outline"
+              className="col-span-full sm:col-auto"
+            >
+              Add Expense
+            </Button>
+            <Button
+              type="submit"
+              onClick={(e) => addTransaction(e, 'income')}
+              variant="outline"
+              className="col-span-full sm:col-auto"
+            >
+              Add Income
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
 {/* Mobile toggle */}
 <div className="sm:hidden mb-2">
-  <button
+  <Button
     onClick={() => setShowFilters(prev => !prev)}
-    className="bg-gray-700 text-white px-3 py-1 rounded"
+    variant="outline"
   >
     {showFilters ? 'Hide Filters' : 'Show Filters'}
-  </button>
+  </Button>
 </div>
 
-<div className={`bg-white p-4 rounded shadow mb-4
-                 ${!showFilters ? 'hidden sm:block' : 'block'}`}>
-        {/* Filters */}
-      <div className="bg-white p-4 rounded shadow mb-4">
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Filters</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-          {/* Category */}
-          <select
-            value={selectedCategory}
-            onChange={e => setSelectedCategory(e.target.value)}
-            className="border p-2 rounded text-gray-900"
-          >
-            <option value="all">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          {/* Min Amount */}
-          <input
-            type="number"
-            placeholder="Min Amount"
-            value={minAmount}
-            onChange={e => setMinAmount(e.target.value)}
-            className="border p-2 rounded text-gray-900"
-          />
-          {/* Max Amount */}
-          <input
-            type="number"
-            placeholder="Max Amount"
-            value={maxAmount}
-            onChange={e => setMaxAmount(e.target.value)}
-            className="border p-2 rounded text-gray-900"
-          />
-          {/* Start Date */}
-          <input
-            type="date"
-            value={startDate}
-            onChange={e => setStartDate(e.target.value)}
-            className="border p-2 rounded text-gray-900"
-          />
-          {/* End Date */}
-          <input
-            type="date"
-            value={endDate}
-            onChange={e => setEndDate(e.target.value)}
-            className="border p-2 rounded text-gray-900"
-          />
-        </div>
-        <button
-          onClick={() => {
-            setSelectedCategory('all')
-            setMinAmount('')
-            setMaxAmount('')
-            setStartDate('')
-            setEndDate('')
-          }}
-          className="mt-3 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
-        >
-          Reset Filters
-        </button>
-      </div>
-
-</div>
+<Card className={`mb-4 ${!showFilters ? 'hidden sm:block' : 'block'}`}>
+  <CardHeader>
+    <CardTitle>Filters</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+      {/* Category */}
+      <select
+        value={selectedCategory}
+        onChange={e => setSelectedCategory(e.target.value)}
+        className="border p-2 rounded"
+      >
+        <option value="all">All Categories</option>
+        {categories.map(cat => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
+      </select>
+      {/* Min Amount */}
+      <Input
+        type="number"
+        placeholder="Min Amount"
+        value={minAmount}
+        onChange={e => setMinAmount(e.target.value)}
+      />
+      {/* Max Amount */}
+      <Input
+        type="number"
+        placeholder="Max Amount"
+        value={maxAmount}
+        onChange={e => setMaxAmount(e.target.value)}
+      />
+      {/* Start Date */}
+      <Input
+        type="date"
+        value={startDate}
+        onChange={e => setStartDate(e.target.value)}
+      />
+      {/* End Date */}
+      <Input
+        type="date"
+        value={endDate}
+        onChange={e => setEndDate(e.target.value)}
+      />
+    </div>
+    <Button
+      onClick={() => {
+        setSelectedCategory('all')
+        setMinAmount('')
+        setMaxAmount('')
+        setStartDate('')
+        setEndDate('')
+      }}
+      variant="outline"
+      className="mt-3"
+    >
+      Reset Filters
+    </Button>
+  </CardContent>
+</Card>
 
       {/* Transactions List */}
-      <div className="bg-white p-6 rounded shadow">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Transactions</h2>
-        {filteredTransactions.length === 0 ? (
-          <p className="text-gray-500">No transactions found</p>
-        ) : (
-          <ul className="space-y-4">
-            {filteredTransactions.map(t => (
-              <li
-                key={t.id}
-                className="border p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-50"
-              >
-                <div className="text-gray-900">
-                  {`${t.transaction_type} `}<strong>{t.category}</strong>: ${t.amount.toFixed(2)}
-                  {` on ${new Date(t.transaction_date).toLocaleDateString()}`}
-                  {t.description && ` — ${t.description}`}
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                  <input
-                    type="email"
-                    placeholder="Partner email"
-                    value={shareEmails[t.id] || ''}
-                    onChange={e =>
-                      setShareEmails({ ...shareEmails, [t.id]: e.target.value })
-                    }
-                    className="border p-1 rounded flex-1 sm:w-48 text-gray-900"
-                  />
-                  <button
-                    onClick={() => shareTransaction(t.id)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                  >
-                    Share
-                  </button>
-                  <button
-                    onClick={() => deleteTransaction(t.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredTransactions.length === 0 ? (
+            <p className="text-muted-foreground">No transactions found</p>
+          ) : (
+            <ul className="space-y-4">
+              {filteredTransactions.map(t => (
+                <li
+                  key={t.id}
+                  className="border p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+                >
+                  <div className="flex-1">
+                    {`${t.transaction_type} `}<strong>{t.category}</strong>: ${t.amount.toFixed(2)}
+                    {` on ${new Date(t.transaction_date).toLocaleDateString()}`}
+                    {t.description && ` — ${t.description}`}
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+                    <Input
+                      type="email"
+                      placeholder="Partner email"
+                      value={shareEmails[t.id] || ''}
+                      onChange={e =>
+                        setShareEmails({ ...shareEmails, [t.id]: e.target.value })
+                      }
+                      className="flex-1 sm:w-48"
+                    />
+                    <Button
+                      onClick={() => shareTransaction(t.id)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Share
+                    </Button>
+                    <Button
+                      onClick={() => deleteTransaction(t.id)}
+                      variant="destructive"
+                      size="sm"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </Page>
   )
 }
