@@ -3,6 +3,30 @@ import * as d3 from 'd3'
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
 import { useRouter } from 'next/router'
 
+// Color palette
+const colorPalette = {
+  income: '#059669',      // Emerald
+  expense: '#dc2626',     // Red
+  remaining: '#16a34a',   // Green
+  tax: '#dc2626',         // Red
+  uif: '#f59e0b',         // Amber
+  pension: '#ea580c',     // Orange
+  gross: '#6b7280',       // Grey
+  net: '#4f46e5',         // Indigo
+  category: [
+    '#3b82f6',  // Blue
+    '#8b5cf6',  // Violet
+    '#ec4899',  // Pink
+    '#f59e0b',  // Amber
+    '#14b8a6',  // Teal
+    '#6366f1',  // Indigo
+    '#f97316',  // Orange
+    '#06b6d4',  // Cyan
+    '#84cc16',  // Lime
+    '#a855f7',  // Purple
+  ]
+}
+
 interface CategoryTotal {
   category: string
   total: number
@@ -52,7 +76,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
 
     const categoryColor = d3.scaleOrdinal<string>()
       .domain([...expenseCategories, ...incomeCategories])
-      .range(d3.schemeTableau10)
+      .range(colorPalette.category)
 
     const nodes: { name: string }[] = [{ name: 'Gross [Gross Income]' }]
     const links: { source: number; target: number; value: number }[] = []
@@ -118,17 +142,17 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       .attr('d', sankeyLinkHorizontal())
       .attr('stroke', d => {
         const name = (d.target as SankeyNode).name
-        if (name.startsWith('Tax')) return '#ef4444'
-        if (name.startsWith('UIF')) return '#fbbf24'
-        if (name.startsWith('Pension')) return '#f97316'
-        if (name.startsWith('Remaining')) return '#22c55e'
-        if (incomeCategories.some(c=>name.startsWith(c))) return '#10b981'
+        if (name.startsWith('Tax')) return colorPalette.tax
+        if (name.startsWith('UIF')) return colorPalette.uif
+        if (name.startsWith('Pension')) return colorPalette.pension
+        if (name.startsWith('Remaining')) return colorPalette.remaining
+        if (incomeCategories.some(c=>name.startsWith(c))) return colorPalette.income
         const categoryName = name.split(' [')[0]
         return categoryColor(categoryName)
       })
-      .attr('stroke-width', d=>Math.max(1,d.width||1))
+      .attr('stroke-width', d=>Math.max(0.5,d.width||0.5))
       .attr('fill','none')
-      .attr('opacity',0.5)
+      .attr('opacity',0.3)
 
     // Nodes
     g.append('g')
@@ -139,17 +163,20 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       .attr('y', d => d.y0 || 0)
       .attr('height', d => (d.y1||0)-(d.y0||0))
       .attr('width', d => (d.x1||0)-(d.x0||0))
+      .attr('rx', 4)
       .attr('fill', d=>{
-        if (d.name.startsWith('Gross')) return '#f59e0b'
-        if (d.name.startsWith('Net')) return '#6366f1'
-        if (d.name.startsWith('Remaining')) return '#22c55e'
-        if (d.name.startsWith('Tax')) return '#ef4444'
-        if (d.name.startsWith('UIF')) return '#fbbf24'
-        if (d.name.startsWith('Pension')) return '#f97316'
-        if (incomeCategories.some(c=>d.name.startsWith(c))) return '#10b981'
+        if (d.name.startsWith('Gross')) return colorPalette.gross
+        if (d.name.startsWith('Net')) return colorPalette.net
+        if (d.name.startsWith('Remaining')) return colorPalette.remaining
+        if (d.name.startsWith('Tax')) return colorPalette.tax
+        if (d.name.startsWith('UIF')) return colorPalette.uif
+        if (d.name.startsWith('Pension')) return colorPalette.pension
+        if (incomeCategories.some(c=>d.name.startsWith(c))) return colorPalette.income
         const categoryName = d.name.split(' [')[0]
         return categoryColor(categoryName)
-      }).style('cursor', 'pointer')
+      })
+      .attr('opacity', 1)
+      .style('cursor', 'pointer')
       .on('click', (event, d) => {
         // Strip out any " [number]" part of the name
         const categoryName = d.name.replace(/\s*\[\d+\]$/, '')
@@ -161,12 +188,14 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       .selectAll('text')
       .data(sankeyNodes)
       .join('text')
-      .attr('x', d=>(d.x1||0)+6)
+      .attr('x', d=>(d.x1||0)+8)
       .attr('y', d=>((d.y1||0)+(d.y0||0))/2)
       .attr('alignment-baseline','middle')
       .text(d=>d.name)
-      .attr('fill','#ffffff')
-      .style('font-size','12px')
+      .attr('fill','currentColor')
+      .attr('opacity', 1)
+      .style('font-size','11px')
+      .style('font-weight', '500')
 
        const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 3]) // min/max zoom

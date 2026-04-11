@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 body {
-	@apply min-h-screen select-none bg-zinc-50 text-zinc-900 antialiased p-safe dark:bg-zinc-900 dark:text-zinc-50;
+	@apply min-h-screen select-none text-zinc-50 antialiased p-safe;
+	background-color: var(--bg-custom);
 
 	/* PWA enhancements */
 	-webkit-overflow-scrolling: touch;
@@ -17,6 +18,9 @@ body {
   .theme {
 		--font-heading: var(--font-sans);
 		--font-sans: var(--font-sans);
+		--bg-custom: #111111;
+		--appbar-bg: #1e1e1e;
+		--bottomnav-bg: #1e1e1e;
 	}
   :root {
 		--background: 0 0% 100%;
@@ -53,7 +57,7 @@ body {
 		--sidebar-ring: 0 0% 37%;
 	}
   .dark {
-		--background: 0 0% 8%;
+		--background: 0 0% 3%;
 		--foreground: 0 0% 99%;
 		--card: 0 0% 11%;
 		--card-foreground: 0 0% 99%;

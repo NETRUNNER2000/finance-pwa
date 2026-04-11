@@ -23,8 +23,8 @@ const Appbar = () => {
   }, [memoUser, setUser])
   
   return (
-    <div className='fixed top-0 left-0 z-20 w-full bg-background pt-safe'>
-      <header className='border-b bg-background px-safe'>
+    <div className='fixed top-0 left-0 z-20 w-full pt-safe' style={{ backgroundColor: 'var(--appbar-bg)' }}>
+      <header className='border-b px-safe' style={{ backgroundColor: 'var(--appbar-bg)' }}>
         <div className='mx-auto flex h-20 max-w-screen-md items-center justify-between px-6'>
 
           <Link href='/'>
