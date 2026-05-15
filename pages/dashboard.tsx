@@ -16,16 +16,16 @@ export default function Dashboard() {
   const { settings, updateSettings } = useSettings()
   const { categoryTotals, last12Months, ensureDashboardData } = useDashboard()
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getUser()
-      if (!data.user) {
-        router.replace('/landing')
-      }
-    }
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     const { data } = await supabase.auth.getUser()
+  //     if (!data.user) {
+  //       router.replace('/landing')
+  //     }
+  //   }
 
-    checkAuth()
-  }, [router])
+  //   checkAuth()
+  // }, [router])
 
   const addMonths = (sourceDate: Date, months: number): Date => {
     const date = new Date(sourceDate)

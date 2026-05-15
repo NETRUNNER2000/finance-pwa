@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.netlify.personal_finance_netrunner.twa",
+      "sha256_cert_fingerprints": [
+        "52:AA:3C:DD:D9:3C:B8:AE:20:00:C4:49:FC:CD:79:F7:00:F5:4C:93:06:C0:6E:55:C5:E4:55:F6:B4:40:D8:17"
+      ]
+    }
+  }
+]

@@ -1,24 +1,30 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    const routeUser = async () => {
+    const run = async () => {
       const { data } = await supabase.auth.getUser()
 
-      if (data.user) {
-        router.replace('/dashboard')
-      } else {
-        router.replace('/landing')
-      }
+      router.replace(data.user ? '/dashboard' : '/landing')
     }
 
-    routeUser()
-  }, [router])
+    run()
+  }, [])
 
-
-  return null
+  return (
+    <div style={{
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#000',
+      color: '#fff'
+    }}>
+      Loading...
+    </div>
+  )
 }
