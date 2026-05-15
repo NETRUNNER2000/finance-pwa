@@ -18,17 +18,21 @@ export default function LineChart({ last12Months }: LineChartProps) {
   const lineChartRef = useRef<SVGSVGElement | null>(null)
   const tooltipRef = useRef<HTMLDivElement | null>(null)
   const setShowModalRef = useRef<(v: boolean) => void>(() => {})
-
   const [showModal, setShowModal] = useState(false)
-  const { localSettings, updateLocalSettings } = useSettings()
+  const { localSettings, updateLocalSettings } = useSettings()   
+  const MONTHS_TO_SHOW = localSettings.lineChartMonthsToDisplay ?? 4
 
   useEffect(() => {
     setShowModalRef.current = setShowModal
+    
   }, [])
+
+  useEffect(() => {
+    console.log("Local settings in LineChart:", localSettings)
+  }, [localSettings])
 
   const allCategories = Array.from(new Set(last12Months.map(d => d.category)))
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set())
-
   useEffect(() => {
     if (allCategories.length === 0) return
 
@@ -41,6 +45,11 @@ export default function LineChart({ last12Months }: LineChartProps) {
       setVisibleCategories(new Set(allCategories))
     }
   }, [allCategories.length])
+
+  const setMonthsToShow = (value: number) => {
+    const clamped = Math.max(1, Math.min(24, value))
+    updateLocalSettings({ lineChartMonthsToDisplay: clamped })
+  }
 
   const toggleCategory = (category: string) => {
     const next = new Set(visibleCategories)
@@ -68,9 +77,9 @@ export default function LineChart({ last12Months }: LineChartProps) {
     const margin = { top: 20, right: 140, bottom: 30, left: 40 }
     const legendWidth = 120
 
-    const monthDates = Array.from({ length: 12 }, (_, i) => {
+    const monthDates = Array.from({ length: MONTHS_TO_SHOW }, (_, i) => {
       const d = new Date()
-      d.setMonth(d.getMonth() - (11 - i))
+      d.setMonth(d.getMonth() - (MONTHS_TO_SHOW - 1 - i))
       d.setDate(1)
       return d
     })
@@ -202,7 +211,7 @@ export default function LineChart({ last12Months }: LineChartProps) {
       .style('width', '100%')
       .style('height', 'auto')
 
-  }, [last12Months, visibleCategories])
+  }, [last12Months, visibleCategories, MONTHS_TO_SHOW])
 
   return (
     <>
@@ -215,7 +224,21 @@ export default function LineChart({ last12Months }: LineChartProps) {
   style={{ transition: 'opacity 0.1s ease' }}
 />
       </div>
-
+      <div className="flex items-center justify-center gap-4 mt-2">
+        <button
+  onClick={() => setMonthsToShow(MONTHS_TO_SHOW - 1)}
+>
+  −
+</button>
+<span>
+  {MONTHS_TO_SHOW} months
+</span>
+<button
+  onClick={() => setMonthsToShow(MONTHS_TO_SHOW + 1)}
+>
+  +
+</button>
+      </div>
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="max-w-md w-full mx-4">

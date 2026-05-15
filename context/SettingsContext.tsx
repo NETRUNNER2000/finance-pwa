@@ -18,7 +18,8 @@ type Settings = {
 }
 
 type LocalSettings = {
-  visibleLineChartCategories: Set<string>
+  visibleLineChartCategories: Set<string>,
+  lineChartMonthsToDisplay?: number
   // Add more device-specific settings here as needed
 }
 
@@ -46,7 +47,8 @@ const defaultSettings: Settings = {
 }
 
 const defaultLocalSettings: LocalSettings = {
-  visibleLineChartCategories: new Set()
+  visibleLineChartCategories: new Set(),
+  lineChartMonthsToDisplay: 12
 }
 
 const SettingsContext = createContext<SettingsContextType>({
@@ -108,9 +110,10 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     
     if (stored) {
       try {
-        const parsed = JSON.parse(stored) as { visibleLineChartCategories?: string[] }
+        const parsed = JSON.parse(stored) as { visibleLineChartCategories?: string[], lineChartMonthsToDisplay: number }
         setLocalSettings({
-          visibleLineChartCategories: new Set<string>(parsed.visibleLineChartCategories || [])
+          visibleLineChartCategories: new Set<string>(parsed.visibleLineChartCategories || []),
+          lineChartMonthsToDisplay: parsed.lineChartMonthsToDisplay || 12
         })
       } catch (e) {
         console.error('Error parsing local settings:', e)
@@ -131,7 +134,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       
       const key = getLocalSettingsKey()
       const toStore = {
-        visibleLineChartCategories: Array.from(updated.visibleLineChartCategories)
+        visibleLineChartCategories: Array.from(updated.visibleLineChartCategories),
+        lineChartMonthsToDisplay: updated.lineChartMonthsToDisplay
       }
       localStorage.setItem(key, JSON.stringify(toStore))
       
