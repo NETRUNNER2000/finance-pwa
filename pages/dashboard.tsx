@@ -86,7 +86,7 @@ export default function Dashboard() {
         <LineChart last12Months={last12Months} />
       </div>
 
-      <div className="mt-12">
+      {/* <div className="mt-12">
         <h2 className="text-xl font-semibold text-white mb-4">Investment Growth Projection</h2>
         <InvestmentProjectionChart
           initialAmount={10000}
@@ -94,7 +94,7 @@ export default function Dashboard() {
           monthlyRate={0.005}
           months={6}
         />
-      </div>
+      </div> */}
     </Page>
   )
 }

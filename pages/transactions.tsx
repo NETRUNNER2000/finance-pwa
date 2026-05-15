@@ -3,7 +3,7 @@ import DateRangePicker from '../components/DateRangePicker'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { invalidateSupabaseCache } from '../lib/cacheInvalidation'
+//import { invalidateSupabaseCache } from '../lib/cacheInvalidation'
 import { useUser } from '../context/UserContext'
 import { useSettings } from '../context/SettingsContext'
 import { useDashboard } from '../context/DashboardContext'
@@ -149,7 +149,7 @@ useEffect(() => {
         transaction_date: transactionDate
       })
 
-      await invalidateSupabaseCache()
+      // await invalidateSupabaseCache()
       if (settings?.filterDataStartDate && settings?.filterDataEndDate) {
         await refreshDashboardData(
           selectedAccount,
@@ -200,7 +200,7 @@ useEffect(() => {
         .eq('user_id', selectedAccount)
 
       if (error) throw error
-      await invalidateSupabaseCache()
+      // await invalidateSupabaseCache()
       if (settings?.filterDataStartDate && settings?.filterDataEndDate) {
         await refreshDashboardData(
           selectedAccount,

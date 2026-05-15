@@ -78,7 +78,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       .domain([...expenseCategories, ...incomeCategories])
       .range(colorPalette.category)
 
-    const nodes: { name: string }[] = [{ name: 'Gross [Gross Income]' }]
+    const nodes: { name: string }[] = [{ name: `Gross Income [${grossIncome}]` }]
     const links: { source: number; target: number; value: number }[] = []
 
     let nextNodeIndex = 1
