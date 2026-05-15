@@ -152,7 +152,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
       })
       .attr('stroke-width', d=>Math.max(0.5,d.width||0.5))
       .attr('fill','none')
-      .attr('opacity',0.3)
+      .attr('opacity',0.7)
 
     // Nodes
     g.append('g')
@@ -175,7 +175,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
         const categoryName = d.name.split(' [')[0]
         return categoryColor(categoryName)
       })
-      .attr('opacity', 1)
+      .attr('opacity', 0.5)
       .style('cursor', 'pointer')
       .on('click', (event, d) => {
         // Strip out any " [number]" part of the name

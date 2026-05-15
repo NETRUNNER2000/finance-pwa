@@ -20,7 +20,7 @@ export default function LineChart({ last12Months }: LineChartProps) {
   const setShowModalRef = useRef<(v: boolean) => void>(() => {})
   const [showModal, setShowModal] = useState(false)
   const { localSettings, updateLocalSettings } = useSettings()   
-  const MONTHS_TO_SHOW = localSettings.lineChartMonthsToDisplay ?? 4
+  const MONTHS_TO_SHOW = localSettings.lineChartMonthsToDisplay ?? 12
 
   useEffect(() => {
     setShowModalRef.current = setShowModal
