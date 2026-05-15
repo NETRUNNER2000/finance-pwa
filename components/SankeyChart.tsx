@@ -11,8 +11,8 @@ const colorPalette = {
   tax: '#dc2626',         // Red
   uif: '#f59e0b',         // Amber
   pension: '#ea580c',     // Orange
-  gross: '#6b7280',       // Grey
-  net: '#4f46e5',         // Indigo
+  gross: '#d1d1d1',       // Grey
+  net:  '#06b5d4',  // Cyan         // Indigo
   category: [
     '#3b82f6',  // Blue
     '#8b5cf6',  // Violet
@@ -175,7 +175,11 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
         const categoryName = d.name.split(' [')[0]
         return categoryColor(categoryName)
       })
-      .attr('opacity', 0.5)
+      .attr('opacity', d=>{ 
+        if (d.name.startsWith('Gross')) return 1
+        if (d.name.startsWith('Net')) return 1
+        if (d.name.startsWith('Remaining')) return 1
+        return 0.5; })
       .style('cursor', 'pointer')
       .on('click', (event, d) => {
         // Strip out any " [number]" part of the name
