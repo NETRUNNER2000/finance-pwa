@@ -15,6 +15,7 @@ type Settings = {
   monthlyTax: number
   monthlyUIF: number
   monthlyPension: number
+  recuringExpenses: { name: string, amount: number }[]
 }
 
 type LocalSettings = {
@@ -43,7 +44,8 @@ const defaultSettings: Settings = {
   linechartInterval: 'monthly',
   monthlyTax: 0,
   monthlyUIF: 0,
-  monthlyPension: 0
+  monthlyPension: 0,
+  recuringExpenses: []
 }
 
 const defaultLocalSettings: LocalSettings = {
@@ -86,7 +88,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     linechartInterval: data.linechart_interval ?? 'monthly',
     monthlyTax: data.monthly_tax ?? 0,
     monthlyUIF: data.monthly_uif ?? 0,
-    monthlyPension: data.monthly_pension ?? 0
+    monthlyPension: data.monthly_pension ?? 0,
+    recuringExpenses: data.recuring_expenses ?? []
   })
 
   const mapToDB = (settings: Settings, userId: string) => ({
@@ -100,7 +103,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     linechart_interval: settings.linechartInterval,
     monthly_tax: settings.monthlyTax,
     monthly_uif: settings.monthlyUIF,
-    monthly_pension: settings.monthlyPension
+    monthly_pension: settings.monthlyPension,
+    recuring_expenses: settings.recuringExpenses
   })
 
   // 📱 Load local settings from localStorage

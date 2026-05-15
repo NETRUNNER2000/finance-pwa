@@ -40,6 +40,7 @@ interface SankeyChartProps {
     monthlyTax: number
     monthlyUIF: number
     monthlyPension: number
+    recuringExpenses: { name: string, amount: number }[]
   }
 }
 
@@ -47,6 +48,7 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
   const sankeyRef = useRef<SVGSVGElement | null>(null)
   const router = useRouter()
   useEffect(() => {
+    console.log("Settings in SankeyChart:", settings)
     if (!sankeyRef.current) return
     const svg = d3.select(sankeyRef.current)
     svg.selectAll('*').remove()

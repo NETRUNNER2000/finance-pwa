@@ -17,3 +17,9 @@ node_modules
 
 .env
 .env.local
+.aab
+.aok
+*.apk
+.idsig
+.build.gradle
+.gradle*
