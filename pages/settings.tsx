@@ -27,9 +27,6 @@ const Settings = () => {
     filterDataStartDate: new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
     filterDataEndDate: new Date().toISOString().split('T')[0],
     linechartInterval: 'monthly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
-    monthlyTax: 0,
-    monthlyUIF: 0,
-    monthlyPension: 0,
     recuringExpenses: [] as { name: string, amount: number }[]
   })
 
@@ -45,9 +42,6 @@ const Settings = () => {
       filterDataStartDate: settings.filterDataStartDate || new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
       filterDataEndDate: settings.filterDataEndDate || new Date().toISOString().split('T')[0],
       linechartInterval: settings.linechartInterval || 'monthly',
-      monthlyTax: settings.monthlyTax || 0,
-      monthlyUIF: settings.monthlyUIF || 0,
-      monthlyPension: settings.monthlyPension || 0,
       recuringExpenses: settings.recuringExpenses || []
     })
   }, [settings, selectedAccount])
@@ -84,37 +78,6 @@ const Settings = () => {
                   onChange={e => handleChange('grossIncome', parseInt(e.target.value) || 0)}
                 />
               </div>
-
-              <div>
-                <label className="block font-medium mb-1">Monthly Tax</label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={localSettings.monthlyTax}
-                  onChange={e => handleChange('monthlyTax', parseInt(e.target.value) || 0)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium mb-1">Monthly UIF</label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={localSettings.monthlyUIF}
-                  onChange={e => handleChange('monthlyUIF', parseInt(e.target.value) || 0)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium mb-1">Monthly Pension</label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={localSettings.monthlyPension}
-                  onChange={e => handleChange('monthlyPension', parseInt(e.target.value) || 0)}
-                />
-              </div>
-
               <div>
                 <label className="block font-medium mb-1">Payday (1–31)</label>
                 <Input
@@ -243,24 +206,30 @@ const Settings = () => {
               {
                 localSettings.recuringExpenses.map((expense, index) => (
                   <div className="bg-card">
-                    <label className="block font-medium mb-1">Recurring Expense {index + 1}</label>
                     <div className="flex items-center gap-4 ml-4" key={index}>
                       <Input
                         type="text"
                         value={expense.name}
                         onChange={e => {
-                          const newExpenses = [...localSettings.recuringExpenses]
-                          newExpenses[index].name = e.target.value
-                          handleChange('recuringExpenses', newExpenses)
+                            const newExpenses = [...localSettings.recuringExpenses] 
+                            newExpenses[index] = { ...newExpenses[index], name: e.target.value }
+                            handleChange('recuringExpenses', newExpenses)
                         }}
                       />
                       <Input
                         type="number"
                         value={expense.amount}
                         onChange={e => {
-                          const newExpenses = [...localSettings.recuringExpenses]
-                          newExpenses[index].amount = parseFloat(e.target.value) || 0
-                          handleChange('recuringExpenses', newExpenses)
+                            const newExpenses = [...localSettings.recuringExpenses] 
+                            newExpenses[index] = { ...newExpenses[index], amount: parseFloat(e.target.value) || 0 }
+                            // newExpenses.map(expense => {
+                            //   if (expense.name === newRecuringExpense.name) {
+                            //     return {...expense, amount: parseFloat(e.target.value) || 0}
+                            //   }
+                            //   return expense
+                            // })
+
+                            handleChange('recuringExpenses', newExpenses)
                         }}
                       />
                       <Button

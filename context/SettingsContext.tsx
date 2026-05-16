@@ -12,9 +12,6 @@ type Settings = {
   interestRate: number
   investmentBalance: number
   linechartInterval: 'daily' | 'weekly' | 'monthly' | 'yearly'
-  monthlyTax: number
-  monthlyUIF: number
-  monthlyPension: number
   recuringExpenses: { name: string, amount: number }[]
 }
 
@@ -42,9 +39,6 @@ const defaultSettings: Settings = {
   interestRate: 0,
   investmentBalance: 0,
   linechartInterval: 'monthly',
-  monthlyTax: 0,
-  monthlyUIF: 0,
-  monthlyPension: 0,
   recuringExpenses: []
 }
 
@@ -86,9 +80,6 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     interestRate: data.interest_rate ?? 0,
     investmentBalance: data.investment_balance ?? 0,
     linechartInterval: data.linechart_interval ?? 'monthly',
-    monthlyTax: data.monthly_tax ?? 0,
-    monthlyUIF: data.monthly_uif ?? 0,
-    monthlyPension: data.monthly_pension ?? 0,
     recuringExpenses: data.recuring_expenses ?? []
   })
 
@@ -101,9 +92,6 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     interest_rate: settings.interestRate,
     investment_balance: settings.investmentBalance,
     linechart_interval: settings.linechartInterval,
-    monthly_tax: settings.monthlyTax,
-    monthly_uif: settings.monthlyUIF,
-    monthly_pension: settings.monthlyPension,
     recuring_expenses: settings.recuringExpenses
   })
 

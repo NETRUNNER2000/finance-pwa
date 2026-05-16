@@ -37,9 +37,6 @@ interface SankeyChartProps {
   categoryTotals: CategoryTotal[]
   settings: {
     grossIncome: number
-    monthlyTax: number
-    monthlyUIF: number
-    monthlyPension: number
     recuringExpenses: { name: string, amount: number }[]
   }
 }
@@ -58,23 +55,22 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
     const margin = { top: 20, right: 140, bottom: 20, left: 20 }
 
     const grossIncome = settings.grossIncome
-    const tax = settings.monthlyTax
-    const uif = settings.monthlyUIF
-    const pension = settings.monthlyPension
-    const netIncome = grossIncome - tax - uif - pension
-
     const expenseSums: Record<string, number> = {}
     const incomeSums: Record<string, number> = {}
+    
     categoryTotals.forEach(c => {
       if (c.transaction_type === 'expense') expenseSums[c.category] = (expenseSums[c.category] || 0) + c.total
       if (c.transaction_type === 'income') incomeSums[c.category] = (incomeSums[c.category] || 0) + c.total
     })
+      // settings.recuringExpenses.forEach(e => {    
+      //   expenseSums[e.name] = (expenseSums[e.name] || 0) + e.amount
+      // })
 
     const expenseCategories = Object.keys(expenseSums)
     const incomeCategories = Object.keys(incomeSums)
     const spentTotal = Object.values(expenseSums).reduce((a, b) => a + b, 0)
     const incomeTotal = Object.values(incomeSums).reduce((a,b)=>a+b,0)
-    const remaining = Math.max(netIncome + incomeTotal - spentTotal, 0)
+    
 
     const categoryColor = d3.scaleOrdinal<string>()
       .domain([...expenseCategories, ...incomeCategories])
@@ -84,12 +80,11 @@ export default function SankeyChart({ categoryTotals, settings }: SankeyChartPro
     const links: { source: number; target: number; value: number }[] = []
 
     let nextNodeIndex = 1
-    const deductions = [
-      { name: `Tax [${tax}]`, value: tax },
-      { name: `UIF [${uif}]`, value: uif },
-      { name: `Pension [${pension}]`, value: pension },
-    ]
 
+    const deductions = [...settings.recuringExpenses.map(e=>({ name: `${e.name} [${e.amount}]`, value: e.amount })) ]
+    const totalDeductions = deductions.reduce((sum, d) => sum + d.value, 0)
+    const netIncome = grossIncome - totalDeductions
+    const remaining = Math.max(netIncome + incomeTotal - spentTotal, 0)
     deductions.forEach(d => {
       if (d.value > 0) {
         nodes.push({ name: d.name })
