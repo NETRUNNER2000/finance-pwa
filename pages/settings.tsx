@@ -15,6 +15,8 @@ import {
 
 const Settings = () => {
   const { settings, updateSettings, refreshSettings } = useSettings()
+  const [showAddRecuringExpenseForm, setShowRecuringExpenseForm] = useState(false)
+  const [newRecuringExpense, setNewRecuringExpense] = useState({ name: '', amount: 0 })
   const { selectedAccount } = useUser()
 
   const [localSettings, setLocalSettings] = useState({
@@ -27,7 +29,8 @@ const Settings = () => {
     linechartInterval: 'monthly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
     monthlyTax: 0,
     monthlyUIF: 0,
-    monthlyPension: 0
+    monthlyPension: 0,
+    recuringExpenses: [] as { name: string, amount: number }[]
   })
 
   // 🔑 SYNC when settings OR account changes
@@ -44,7 +47,8 @@ const Settings = () => {
       linechartInterval: settings.linechartInterval || 'monthly',
       monthlyTax: settings.monthlyTax || 0,
       monthlyUIF: settings.monthlyUIF || 0,
-      monthlyPension: settings.monthlyPension || 0
+      monthlyPension: settings.monthlyPension || 0,
+      recuringExpenses: settings.recuringExpenses || []
     })
   }, [settings, selectedAccount])
 
@@ -176,6 +180,107 @@ const Settings = () => {
                   onChange={e => handleChange('filterDataEndDate', e.target.value)}
                 />
               </div>
+
+            <div className="flex items-center justify-between">
+               <label className="block font-medium mb-1">Recurring Expenses</label>
+              <button
+                className="rounded-full p-1 hover:bg-accent transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowRecuringExpenseForm(!showAddRecuringExpenseForm)
+                }}
+              >
+                <svg
+                  className={`w-6 h-6 transition-transform text-green-400 ${showAddRecuringExpenseForm ? 'rotate-45' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px rgba(74, 222, 128, 0.8))',
+                    strokeWidth: 2.5
+                  }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button> 
+            </div>
+            
+              {showAddRecuringExpenseForm && (
+                <div className="mt-2">
+                  <Input
+                    type="text"
+                    placeholder="Expense Name"
+                    onChange={e => {
+                      setNewRecuringExpense({ name: e.target.value, amount: newRecuringExpense.amount })
+                    }}
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Amount"
+                    step={0.01}
+                    onChange={e => {
+                     setNewRecuringExpense({ name: newRecuringExpense.name, amount: parseFloat(e.target.value) || 0 })
+                    }}
+                  />
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  handleChange('recuringExpenses', [...localSettings.recuringExpenses, newRecuringExpense])
+                  setNewRecuringExpense({ name: '', amount: 0 })
+                  setShowRecuringExpenseForm(false)
+                }}
+                variant="outline"
+                className="col-span-full sm:col-auto text-green-500 border-green-500 hover:border-green-400 hover:text-green-400"
+                style={{
+                  textShadow: '0 0 10px rgba(74, 222, 128, 0.6)'
+                }}
+              >
+                Add Recurring Expense
+              </Button>
+  
+                </div>
+              )}
+              {
+                localSettings.recuringExpenses.map((expense, index) => (
+                  <div className="bg-card">
+                    <label className="block font-medium mb-1">Recurring Expense {index + 1}</label>
+                    <div className="flex items-center gap-4 ml-4" key={index}>
+                      <Input
+                        type="text"
+                        value={expense.name}
+                        onChange={e => {
+                          const newExpenses = [...localSettings.recuringExpenses]
+                          newExpenses[index].name = e.target.value
+                          handleChange('recuringExpenses', newExpenses)
+                        }}
+                      />
+                      <Input
+                        type="number"
+                        value={expense.amount}
+                        onChange={e => {
+                          const newExpenses = [...localSettings.recuringExpenses]
+                          newExpenses[index].amount = parseFloat(e.target.value) || 0
+                          handleChange('recuringExpenses', newExpenses)
+                        }}
+                      />
+                      <Button
+                            onClick={() => {
+                              const newExpenses = localSettings.recuringExpenses.filter((_, i) => _ !== expense)
+                              handleChange('recuringExpenses', newExpenses)
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-destructive/20 hover:text-destructive"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              }
+
 
               <div className="flex gap-2 pt-4">
                 <Button
