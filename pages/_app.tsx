@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <UserProvider>
       <SettingsProvider>
         <DashboardProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
             <Component {...pageProps} />
           </ThemeProvider>
         </DashboardProvider>
