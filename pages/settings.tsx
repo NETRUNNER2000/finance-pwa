@@ -205,7 +205,7 @@ const Settings = () => {
               )}
               {
                 localSettings.recuringExpenses.map((expense, index) => (
-                  <div className="bg-card">
+                  <div className="bg-card" key={index}>
                     <div className="flex items-center gap-4 ml-4" key={index}>
                       <Input
                         type="text"
