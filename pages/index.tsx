@@ -5,15 +5,15 @@ import { useEffect } from 'react'
 export default function Home() {
   const router = useRouter()
 
-  // useEffect(() => {
-  //   const run = async () => {
-  //     const { data } = await supabase.auth.getUser()
+  useEffect(() => {
+    const run = async () => {
+      const { data } = await supabase.auth.getUser()
 
-  //     router.replace(data.user ? '/dashboard' : '/landing')
-  //   }
+      router.replace(data.user ? '/dashboard' : '/landing')
+    }
 
-  //   run()
-  // }, [router])
+    run()
+  }, [router])
 
   return (
     <div style={{
