@@ -11,10 +11,10 @@ interface LastMonthData {
 }
 
 interface LineChartProps {
-  last12Months: LastMonthData[]
+  lastNMonths: LastMonthData[]
 }
 
-export default function LineChart({ last12Months }: LineChartProps) {
+export default function LineChart({ lastNMonths }: LineChartProps) {
   const lineChartRef = useRef<SVGSVGElement | null>(null)
   const tooltipRef = useRef<HTMLDivElement | null>(null)
   const setShowModalRef = useRef<(v: boolean) => void>(() => {})
@@ -31,7 +31,7 @@ export default function LineChart({ last12Months }: LineChartProps) {
     console.log("Local settings in LineChart:", localSettings)
   }, [localSettings])
 
-  const allCategories = Array.from(new Set(last12Months.map(d => d.category)))
+  const allCategories = Array.from(new Set(lastNMonths.map(d => d.category)))
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set())
   useEffect(() => {
     if (allCategories.length === 0) return
@@ -65,7 +65,7 @@ export default function LineChart({ last12Months }: LineChartProps) {
   }
 
   useEffect(() => {
-    if (!lineChartRef.current || last12Months.length === 0) return
+    if (!lineChartRef.current || lastNMonths.length === 0) return
 
     const svg = d3.select(lineChartRef.current)
     svg.selectAll('*').remove()
@@ -77,19 +77,26 @@ export default function LineChart({ last12Months }: LineChartProps) {
     const margin = { top: 20, right: 140, bottom: 30, left: 40 }
     const legendWidth = 120
 
+    const now = new Date()
+
     const monthDates = Array.from({ length: MONTHS_TO_SHOW }, (_, i) => {
-      const d = new Date()
-      d.setMonth(d.getMonth() - (MONTHS_TO_SHOW - 1 - i))
-      d.setDate(1)
-      return d
+      return new Date(
+        now.getFullYear(),
+        now.getMonth() - (MONTHS_TO_SHOW - 1 - i),
+        1
+      )
     })
 
-    const monthNames = monthDates.map(d => d3.timeFormat('%b')(d))
-    const categories = Array.from(new Set(last12Months.map(d => d.category)))
-
+    const monthNames = monthDates.map(
+      d => d3.timeFormat('%b %y')(d)
+    )
+    const categories = Array.from(new Set(lastNMonths.map(d => d.category)))
+    console.log(
+      monthDates.map(d => d.toISOString().slice(0, 10))
+    )
     const dataset = categories.map(cat => {
       const values = monthDates.map(d => {
-        const match = last12Months.filter(
+        const match = lastNMonths.filter(
           item =>
             item.category === cat &&
             new Date(item.month_start).getFullYear() === d.getFullYear() &&
@@ -211,10 +218,11 @@ export default function LineChart({ last12Months }: LineChartProps) {
       .style('width', '100%')
       .style('height', 'auto')
 
-  }, [last12Months, visibleCategories, MONTHS_TO_SHOW])
+  }, [lastNMonths, visibleCategories, MONTHS_TO_SHOW])
 
   return (
     <>
+    <h2 className="text-xl font-semibold text-white mb-4">Transactions Last {MONTHS_TO_SHOW} Months</h2>
       <div className="relative inline-block w-full">
         <svg ref={lineChartRef}></svg>
 
