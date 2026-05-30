@@ -17,7 +17,7 @@ export default function LandingPage() {
         <div className="ambient ambient-b" />
 
         <header className="topbar">
-          <div className="brand">Budget Atlas</div>
+          <div className="brand">Stonks Personal Finance</div>
           <nav className="top-actions">
             <Link href="/login" className="btn btn-ghost">Log In</Link>
             <Link href="/register" className="btn btn-solid">Sign Up</Link>
@@ -65,25 +65,11 @@ export default function LandingPage() {
               Instantly identify your biggest spending streams with flow-style category totals that separate
               income and expenses.
             </p>
-            <svg viewBox="0 0 520 220" className="chart-svg" role="img" aria-label="Category flow chart preview">
-              <rect x="20" y="40" width="120" height="28" rx="8" fill="#1f6feb" />
-              <rect x="20" y="92" width="120" height="28" rx="8" fill="#2ea043" />
-              <rect x="20" y="144" width="120" height="28" rx="8" fill="#d29922" />
-
-              <rect x="380" y="56" width="120" height="36" rx="8" fill="#f85149" />
-              <rect x="380" y="118" width="120" height="36" rx="8" fill="#8b949e" />
-
-              <path d="M140 54 C 220 54, 280 74, 380 74" stroke="#6ea8fe" strokeWidth="14" fill="none" opacity="0.6" />
-              <path d="M140 106 C 230 106, 290 74, 380 74" stroke="#56d364" strokeWidth="14" fill="none" opacity="0.6" />
-              <path d="M140 158 C 220 158, 290 136, 380 136" stroke="#e3b341" strokeWidth="14" fill="none" opacity="0.6" />
-
-              <text x="24" y="58" fill="#fff" fontSize="12">Salary</text>
-              <text x="24" y="110" fill="#fff" fontSize="12">Freelance</text>
-              <text x="24" y="162" fill="#111" fontSize="12">Interest</text>
-
-              <text x="394" y="78" fill="#fff" fontSize="12">Living Costs</text>
-              <text x="394" y="140" fill="#fff" fontSize="12">Savings</text>
-            </svg>
+            <img
+              src="/images/SankeyChart.png"
+              alt="Sankey chart"
+              className="chart-img"
+            />
           </article>
 
           <article className="panel">
@@ -92,28 +78,11 @@ export default function LandingPage() {
               Track trajectory over time with month-by-month trends so you can spot spikes, seasonality,
               and progress.
             </p>
-            <svg viewBox="0 0 520 220" className="chart-svg" role="img" aria-label="Line chart preview">
-              <line x1="40" y1="180" x2="480" y2="180" stroke="#94a3b8" strokeWidth="1" />
-              <line x1="40" y1="30" x2="40" y2="180" stroke="#94a3b8" strokeWidth="1" />
-
-              <polyline
-                points="40,150 80,136 120,128 160,133 200,115 240,108 280,94 320,102 360,84 400,76 440,68 480,60"
-                fill="none"
-                stroke="#f97316"
-                strokeWidth="4"
-              />
-              <polyline
-                points="40,164 80,158 120,150 160,146 200,140 240,132 280,126 320,124 360,118 400,112 440,108 480,102"
-                fill="none"
-                stroke="#0ea5e9"
-                strokeWidth="4"
-              />
-
-              <text x="46" y="198" fill="#475569" fontSize="11">Jan</text>
-              <text x="192" y="198" fill="#475569" fontSize="11">May</text>
-              <text x="334" y="198" fill="#475569" fontSize="11">Sep</text>
-              <text x="456" y="198" fill="#475569" fontSize="11">Dec</text>
-            </svg>
+            <img
+              src="/images/LineChart.png"
+              alt="Line chart"
+              className="chart-img"
+            />
           </article>
         </section>
 
@@ -144,13 +113,10 @@ export default function LandingPage() {
 
       <style jsx>{`
         .landing-root {
-          --bg: #0f141a;
-          --ink: #eaf1f7;
-          --muted: #9eb0c0;
-          --card: rgba(19, 27, 35, 0.8);
-          --stroke: rgba(182, 204, 224, 0.2);
-          --accent: #ff7b39;
-          --accent-dark: #ffb284;
+          /* use app theme instead */
+          background: var(--background);
+          color: var(--foreground);
+          font-family: var(--font-sans);
           min-height: 100vh;
           color: var(--ink);
           background:
@@ -175,7 +141,7 @@ export default function LandingPage() {
         .ambient-a {
           width: 260px;
           height: 260px;
-          background: #ff9b5a;
+          background: #b34adf;
           left: -70px;
           top: 120px;
         }
@@ -282,7 +248,7 @@ export default function LandingPage() {
         }
 
         .btn-solid:hover {
-          background: #ff8f58;
+          background: #8915c8;
         }
 
         .btn-ghost {
