@@ -66,15 +66,19 @@ export default function LandingPage() {
             <div className="mini-grid">
               <div className="stat">
                 <span>Income</span>
-                <strong>R 34,200</strong>
+                <strong>R 100,000</strong>
               </div>
               <div className="stat">
                 <span>Expenses</span>
-                <strong>R 23,910</strong>
+                <strong>R 45,000</strong>
               </div>
               <div className="stat full">
                 <span>Net This Month</span>
-                <strong>R 10,290</strong>
+                <strong>R 55,000</strong>
+              </div>
+              <div className="stat full">
+                <span>Projected Month End Spend</span>
+                <strong>R 80,000</strong>
               </div>
             </div>
           </div>
