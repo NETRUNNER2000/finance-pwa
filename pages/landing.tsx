@@ -5,7 +5,6 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-       
         <meta
           name="description"
           content="Track income and expenses, see category flows, and understand 12-month trends in one personal finance workspace."
@@ -16,31 +15,54 @@ export default function LandingPage() {
         <div className="ambient ambient-a" />
         <div className="ambient ambient-b" />
 
+        {/* HEADER */}
         <header className="topbar">
           <div className="brand">Stonks Personal Finance</div>
+
           <nav className="top-actions">
             <Link href="/login" className="btn btn-ghost">Log In</Link>
             <Link href="/register" className="btn btn-solid">Sign Up</Link>
           </nav>
-        </header>
 
+
+        </header>
+            <div className="mobile-auth">
+              <Link href="/login" className="btn btn-ghost">Log In</Link>
+              <Link href="/register" className="btn btn-solid">Sign Up</Link>
+            </div>
+
+        {/* HERO */}
         <section className="hero">
           <div>
+
             <p className="eyebrow">Personal Finance, Visualized</p>
-            <h1>See where your money comes from, where it goes, and what changes month to month.</h1>
+
+            <h1>
+              See where your money comes from, where it goes, and what changes month to month.
+            </h1>
+
             <p className="hero-copy">
-              Budget Atlas turns your transactions into clear visuals: category flow maps, 12-month trend lines,
-              and date-range filtering so you can actually understand your spending behavior.
+              Budget Atlas turns your transactions into clear visuals: category flow maps,
+              12-month trend lines, and date-range filtering so you can actually understand
+              your spending behavior.
             </p>
+
             <div className="cta-row">
-              <Link href="/register" className="btn btn-solid">Create Free Account</Link>
-              <Link href="/login" className="btn btn-ghost">I Already Have an Account</Link>
+              <Link href="/register" className="btn btn-solid">
+                Create Free Account
+              </Link>
+              <Link href="/login" className="btn btn-ghost">
+                I Already Have an Account
+              </Link>
             </div>
+
+
           </div>
 
           <div className="hero-card">
             <h3>Live Snapshot</h3>
             <p>Preview of the dashboard visuals</p>
+
             <div className="mini-grid">
               <div className="stat">
                 <span>Income</span>
@@ -58,13 +80,14 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* VISUALS */}
         <section className="visuals">
           <article className="panel">
             <h2>Category Flow View</h2>
             <p>
-              Instantly identify your biggest spending streams with flow-style category totals that separate
-              income and expenses.
+              Instantly identify your biggest spending streams with flow-style category totals.
             </p>
+
             <img
               src="/images/SankeyChart.png"
               alt="Sankey chart"
@@ -75,9 +98,9 @@ export default function LandingPage() {
           <article className="panel">
             <h2>12-Month Trend Line</h2>
             <p>
-              Track trajectory over time with month-by-month trends so you can spot spikes, seasonality,
-              and progress.
+              Track trajectory over time and spot spikes, seasonality, and progress.
             </p>
+
             <img
               src="/images/LineChart.png"
               alt="Line chart"
@@ -86,24 +109,27 @@ export default function LandingPage() {
           </article>
         </section>
 
+        {/* FEATURES */}
         <section className="feature-strip">
           <div className="feature">
             <h3>Fast Filtering</h3>
-            <p>Adjust date ranges and instantly compare outcomes without losing context.</p>
+            <p>Adjust date ranges instantly without losing context.</p>
           </div>
           <div className="feature">
             <h3>Shared Accounts</h3>
-            <p>Switch between shared account views and keep household finances aligned.</p>
+            <p>Keep household finances aligned across users.</p>
           </div>
           <div className="feature">
             <h3>Actionable Clarity</h3>
-            <p>From raw transactions to patterns you can act on in a few clicks.</p>
+            <p>Turn transactions into decisions, not confusion.</p>
           </div>
         </section>
 
+        {/* CTA */}
         <section className="closing">
           <h2>Start seeing your finances clearly.</h2>
-          <p>Sign up in under a minute, add transactions, and get instant visual insight.</p>
+          <p>Sign up in under a minute and get instant insight.</p>
+
           <div className="cta-row center">
             <Link href="/register" className="btn btn-solid">Sign Up</Link>
             <Link href="/login" className="btn btn-ghost">Log In</Link>
@@ -112,129 +138,142 @@ export default function LandingPage() {
       </main>
 
       <style jsx>{`
+        /* ======================
+           BASE THEME (CLEAN DARK)
+        ====================== */
         .landing-root {
-          /* use app theme instead */
-          background: var(--background);
-          color: var(--foreground);
-          font-family: var(--font-sans);
           min-height: 100vh;
-          color: var(--ink);
-          background:
-            radial-gradient(circle at 10% 20%, rgba(243, 184, 125, 0.45), transparent 40%),
-            radial-gradient(circle at 92% 78%, rgba(107, 164, 200, 0.28), transparent 38%),
-            var(--bg);
           padding: 1.5rem;
-          font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
           position: relative;
           overflow: hidden;
+
+          color: #e5e7eb;
+          background: #0b0f14;
+
+          font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         }
 
+        /* Ambient blobs */
         .ambient {
           position: absolute;
           border-radius: 999px;
-          filter: blur(42px);
-          opacity: 0.38;
+          filter: blur(60px);
+          opacity: 0.35;
           pointer-events: none;
-          animation: drift 12s ease-in-out infinite alternate;
         }
 
         .ambient-a {
-          width: 260px;
-          height: 260px;
-          background: #b34adf;
-          left: -70px;
+          width: 280px;
+          height: 280px;
+          background: #7c3aed;
+          left: -80px;
           top: 120px;
         }
 
+        @media (max-width: 900px) {
+  .mobile-auth {
+    display: flex;
+  }
+}
+        .mobile-auth {
+          margin-top: 0;
+          margin-bottom: 0;     
+          display: none;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+        }
         .ambient-b {
-          width: 240px;
-          height: 240px;
-          background: #4ca7d8;
-          right: -50px;
-          bottom: 120px;
-          animation-delay: 1.5s;
+          width: 260px;
+          height: 260px;
+          background: #06b6d4;
+          right: -80px;
+          bottom: 100px;
         }
 
+        /* ======================
+           HEADER
+        ====================== */
         .topbar {
-          max-width: 1120px;
+          max-width: 1100px;
           margin: 0 auto;
+
           display: flex;
           justify-content: space-between;
           align-items: center;
-          position: relative;
-          z-index: 2;
+          gap: 1rem;
         }
 
         .brand {
-          letter-spacing: 0.06em;
           font-weight: 800;
-          font-size: 1.1rem;
+          letter-spacing: 0.06em;
+          font-size: 1rem;
           text-transform: uppercase;
+          white-space: nowrap;
         }
 
         .top-actions {
           display: flex;
-          gap: 0.75rem;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
         }
 
+        /* ======================
+           HERO
+        ====================== */
         .hero {
-          max-width: 1120px;
-          margin: 2.2rem auto 0;
+          max-width: 1100px;
+          margin: 2.5rem auto 0;
+
           display: grid;
-          gap: 1.5rem;
-          grid-template-columns: 1.1fr 0.9fr;
-          align-items: stretch;
-          position: relative;
-          z-index: 2;
-          animation: rise 550ms ease-out;
+          grid-template-columns: 1.2fr 0.8fr;
+          gap: 2rem;
         }
 
         .eyebrow {
-          color: var(--accent-dark);
+          color: #a78bfa;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
+          font-size: 0.75rem;
           font-weight: 700;
-          font-size: 0.78rem;
-          margin: 0 0 0.6rem;
         }
 
         h1 {
-          font-family: "Rockwell", "Palatino Linotype", serif;
-          font-size: clamp(2rem, 4.8vw, 3.6rem);
-          line-height: 1.05;
-          margin: 0;
-          max-width: 16ch;
+          font-size: clamp(1.8rem, 4vw, 3rem);
+          line-height: 1.1;
+          margin: 0.5rem 0 1rem;
         }
 
         .hero-copy {
-          margin-top: 1rem;
-          max-width: 56ch;
-          color: var(--muted);
-          font-size: 1.03rem;
-          line-height: 1.65;
+          color: #9ca3af;
+          line-height: 1.6;
+          max-width: 55ch;
         }
 
         .cta-row {
           display: flex;
+          gap: 0.8rem;
+          margin-top: 1.5rem;
           flex-wrap: wrap;
-          gap: 0.75rem;
-          margin-top: 1.4rem;
         }
 
         .cta-row.center {
           justify-content: center;
         }
 
+        /* ======================
+           BUTTONS
+        ====================== */
         .btn {
+          padding: 0.7rem 1rem;
+          border-radius: 999px;
+          text-decoration: none;
+          font-weight: 600;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0.72rem 1.05rem;
-          border-radius: 999px;
-          text-decoration: none;
-          border: 1px solid transparent;
-          transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
-          font-weight: 700;
+          transition: 0.15s ease;
+          white-space: nowrap;
         }
 
         .btn:hover {
@@ -242,58 +281,49 @@ export default function LandingPage() {
         }
 
         .btn-solid {
-          background: var(--accent);
-          color: #101418;
-          box-shadow: 0 7px 16px rgba(255, 123, 57, 0.35);
+          background: #7c3aed;
+          color: white;
         }
 
         .btn-solid:hover {
-          background: #8915c8;
+          background: #6d28d9;
         }
 
         .btn-ghost {
-          border-color: var(--stroke);
-          background: rgba(23, 33, 43, 0.72);
-          color: var(--ink);
-          backdrop-filter: blur(6px);
+          border: 1px solid #2a3441;
+          background: rgba(255,255,255,0.03);
+          color: #e5e7eb;
         }
 
+        /* ======================
+           CARDS
+        ====================== */
         .hero-card,
         .panel,
         .feature,
         .closing {
-          background: var(--card);
-          border: 1px solid var(--stroke);
-          backdrop-filter: blur(6px);
-        }
-
-        .hero-card {
-          border-radius: 18px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid #1f2937;
+          border-radius: 16px;
           padding: 1.2rem;
-          animation: rise 700ms ease-out;
-        }
-
-        .hero-card h3 {
-          margin: 0;
-          font-size: 1.1rem;
+          backdrop-filter: blur(10px);
         }
 
         .hero-card p {
-          margin: 0.45rem 0 1rem;
-          color: var(--muted);
+          color: #9ca3af;
         }
 
         .mini-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0.65rem;
+          gap: 0.6rem;
         }
 
         .stat {
           padding: 0.7rem;
           border-radius: 12px;
-          border: 1px solid var(--stroke);
-          background: rgba(15, 21, 28, 0.7);
+          background: rgba(0,0,0,0.2);
+          border: 1px solid #1f2937;
         }
 
         .stat.full {
@@ -301,64 +331,45 @@ export default function LandingPage() {
         }
 
         .stat span {
-          color: var(--muted);
-          display: block;
-          font-size: 0.86rem;
+          font-size: 0.8rem;
+          color: #9ca3af;
         }
 
         .stat strong {
-          font-size: 1.1rem;
+          display: block;
+          margin-top: 0.2rem;
         }
 
+        /* ======================
+           VISUALS
+        ====================== */
         .visuals {
-          max-width: 1120px;
-          margin: 1.7rem auto 0;
+          max-width: 1100px;
+          margin: 2rem auto 0;
+
           display: grid;
-          gap: 1rem;
           grid-template-columns: 1fr 1fr;
-          position: relative;
-          z-index: 2;
+          gap: 1rem;
         }
 
-        .panel {
-          border-radius: 18px;
-          padding: 1.1rem;
-          animation: rise 850ms ease-out;
-        }
-
-        .panel h2 {
-          margin: 0;
-          font-size: 1.2rem;
-        }
-
-        .panel p {
-          color: var(--muted);
-          margin-top: 0.5rem;
-          margin-bottom: 0.9rem;
-        }
-
-        .chart-svg {
+        .chart-img {
           width: 100%;
           height: auto;
+          margin-top: 0.8rem;
           border-radius: 12px;
-          border: 1px solid var(--stroke);
-          background: rgba(15, 21, 28, 0.76);
+          border: 1px solid #1f2937;
         }
 
+        /* ======================
+           FEATURES
+        ====================== */
         .feature-strip {
-          max-width: 1120px;
-          margin: 1rem auto 0;
-          display: grid;
-          gap: 0.8rem;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          position: relative;
-          z-index: 2;
-        }
+          max-width: 1100px;
+          margin: 2rem auto 0;
 
-        .feature {
-          border-radius: 14px;
-          padding: 1rem;
-          animation: rise 1s ease-out;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
         }
 
         .feature h3 {
@@ -366,34 +377,51 @@ export default function LandingPage() {
         }
 
         .feature p {
-          margin: 0.45rem 0 0;
-          color: var(--muted);
+          color: #9ca3af;
         }
 
+        /* ======================
+           FOOTER CTA
+        ====================== */
         .closing {
-          max-width: 1120px;
-          margin: 1rem auto 2.2rem;
-          border-radius: 18px;
-          padding: 1.35rem;
+          max-width: 1100px;
+          margin: 2rem auto 3rem;
           text-align: center;
-          position: relative;
-          z-index: 2;
-          animation: rise 1.1s ease-out;
         }
 
-        .closing h2 {
-          margin: 0;
-          font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-          font-family: "Rockwell", "Palatino Linotype", serif;
-        }
+        /* ======================
+           RESPONSIVE FIX
+        ====================== */
 
-        .closing p {
-          color: var(--muted);
-          margin-top: 0.6rem;
-        }
+        @media (max-width: 900px) {
+  .top-actions {
+    display: none;
+  }
+}
+  @media (max-width: 900px) {
+  .mobile-auth {
+    display: flex;
+  }
+}
 
-        @media (max-width: 960px) {
-          .hero,
+@media (max-width: 900px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .brand {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+        @media (max-width: 900px) {
+          .hero {
+            grid-template-columns: 1fr;
+          }
+
           .visuals {
             grid-template-columns: 1fr;
           }
@@ -401,25 +429,10 @@ export default function LandingPage() {
           .feature-strip {
             grid-template-columns: 1fr;
           }
-        }
 
-        @keyframes rise {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes drift {
-          from {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          to {
-            transform: translate3d(10px, -8px, 0) scale(1.08);
+          .top-actions {
+            width: 100%;
+            justify-content: flex-end;
           }
         }
       `}</style>
